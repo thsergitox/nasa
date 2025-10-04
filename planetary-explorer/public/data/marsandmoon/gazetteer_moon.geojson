@@ -1,0 +1,95 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.834599999999995,
+                8.3487
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mare Tranquillitatis",
+            "feature_type": null,
+            "lat": 8.3487,
+            "lon_east_0_360": 30.8346,
+            "lon_westneg_180": 30.834599999999995
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                3.14670000000001,
+                25.7159
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Rima Hadley",
+            "feature_type": null,
+            "lat": 25.7159,
+            "lon_east_0_360": 3.1467,
+            "lon_westneg_180": 3.14670000000001
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                15.666699999999992,
+                -11.7428
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Descartes",
+            "feature_type": null,
+            "lat": -11.7428,
+            "lon_east_0_360": 15.6667,
+            "lon_westneg_180": 15.666699999999992
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                -16.97380000000001,
+                -6.061
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Fra Mauro",
+            "feature_type": null,
+            "lat": -6.061,
+            "lon_east_0_360": -16.9738,
+            "lon_westneg_180": -16.97380000000001
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.786699999999996,
+                20.0702
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Taurus-Littrow Valley",
+            "feature_type": null,
+            "lat": 20.0702,
+            "lon_east_0_360": 30.7867,
+            "lon_westneg_180": 30.786699999999996
+        }
+    }
+    ]
+}

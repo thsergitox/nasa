@@ -1,0 +1,410 @@
+{
+  "rima ariadaeus": {
+    "body": "Moon",
+    "lat": 6.4752,
+    "lon": 13.4381,
+    "lon_180": 13.438099999999991,
+    "feature_type": null,
+    "raw_name": "Rima Ariadaeus"
+  },
+  "catena littrow": {
+    "body": "Moon",
+    "lat": 22.2308,
+    "lon": 29.6114,
+    "lon_180": 29.611400000000003,
+    "feature_type": null,
+    "raw_name": "Catena Littrow"
+  },
+  "rima hadley": {
+    "body": "Moon",
+    "lat": 25.7159,
+    "lon": 3.1467,
+    "lon_180": 3.14670000000001,
+    "feature_type": null,
+    "raw_name": "Rima Hadley"
+  },
+  "rimae littrow": {
+    "body": "Moon",
+    "lat": 22.4678,
+    "lon": 30.4736,
+    "lon_180": 30.473600000000005,
+    "feature_type": null,
+    "raw_name": "Rimae Littrow"
+  },
+  "mons hadley delta": {
+    "body": "Moon",
+    "lat": 25.723,
+    "lon": 3.7065,
+    "lon_180": 3.7065000000000055,
+    "feature_type": null,
+    "raw_name": "Mons Hadley Delta"
+  },
+  "copernicus": {
+    "body": "Moon",
+    "lat": 9.6209,
+    "lon": -20.0786,
+    "lon_180": -20.078599999999994,
+    "feature_type": null,
+    "raw_name": "Copernicus"
+  },
+  "descartes": {
+    "body": "Moon",
+    "lat": -11.7428,
+    "lon": 15.6667,
+    "lon_180": 15.666699999999992,
+    "feature_type": null,
+    "raw_name": "Descartes"
+  },
+  "fra mauro": {
+    "body": "Moon",
+    "lat": -6.061,
+    "lon": -16.9738,
+    "lon_180": -16.97380000000001,
+    "feature_type": null,
+    "raw_name": "Fra Mauro"
+  },
+  "littrow": {
+    "body": "Moon",
+    "lat": 21.5037,
+    "lon": 31.3941,
+    "lon_180": 31.39410000000001,
+    "feature_type": null,
+    "raw_name": "Littrow"
+  },
+  "mare tranquillitatis": {
+    "body": "Moon",
+    "lat": 8.3487,
+    "lon": 30.8346,
+    "lon_180": 30.834599999999995,
+    "feature_type": null,
+    "raw_name": "Mare Tranquillitatis"
+  },
+  "mons hadley": {
+    "body": "Moon",
+    "lat": 26.6948,
+    "lon": 4.1183,
+    "lon_180": 4.118300000000005,
+    "feature_type": null,
+    "raw_name": "Mons Hadley"
+  },
+  "fra mauro j": {
+    "body": "Moon",
+    "lat": -2.6171,
+    "lon": -18.648,
+    "lon_180": -18.647999999999996,
+    "feature_type": null,
+    "raw_name": "Fra Mauro J"
+  },
+  "fra mauro r": {
+    "body": "Moon",
+    "lat": -2.2664,
+    "lon": -15.5991,
+    "lon_180": -15.599099999999993,
+    "feature_type": null,
+    "raw_name": "Fra Mauro R"
+  },
+  "fra mauro t": {
+    "body": "Moon",
+    "lat": -2.0603,
+    "lon": -19.4144,
+    "lon_180": -19.4144,
+    "feature_type": null,
+    "raw_name": "Fra Mauro T"
+  },
+  "fra mauro z": {
+    "body": "Moon",
+    "lat": -3.8143,
+    "lon": -14.6593,
+    "lon_180": -14.659300000000002,
+    "feature_type": null,
+    "raw_name": "Fra Mauro Z"
+  },
+  "copernicus a": {
+    "body": "Moon",
+    "lat": 9.5224,
+    "lon": -18.9003,
+    "lon_180": -18.900300000000016,
+    "feature_type": null,
+    "raw_name": "Copernicus A"
+  },
+  "copernicus b": {
+    "body": "Moon",
+    "lat": 7.5005,
+    "lon": -22.3873,
+    "lon_180": -22.38730000000001,
+    "feature_type": null,
+    "raw_name": "Copernicus B"
+  },
+  "copernicus c": {
+    "body": "Moon",
+    "lat": 7.1181,
+    "lon": -15.4393,
+    "lon_180": -15.439300000000003,
+    "feature_type": null,
+    "raw_name": "Copernicus C"
+  },
+  "copernicus d": {
+    "body": "Moon",
+    "lat": 12.1977,
+    "lon": -24.7973,
+    "lon_180": -24.797300000000007,
+    "feature_type": null,
+    "raw_name": "Copernicus D"
+  },
+  "copernicus e": {
+    "body": "Moon",
+    "lat": 6.4039,
+    "lon": -22.7005,
+    "lon_180": -22.700500000000005,
+    "feature_type": null,
+    "raw_name": "Copernicus E"
+  },
+  "copernicus f": {
+    "body": "Moon",
+    "lat": 5.8856,
+    "lon": -22.2444,
+    "lon_180": -22.244399999999985,
+    "feature_type": null,
+    "raw_name": "Copernicus F"
+  },
+  "copernicus g": {
+    "body": "Moon",
+    "lat": 5.9232,
+    "lon": -21.5103,
+    "lon_180": -21.5103,
+    "feature_type": null,
+    "raw_name": "Copernicus G"
+  },
+  "copernicus h": {
+    "body": "Moon",
+    "lat": 6.8915,
+    "lon": -18.2864,
+    "lon_180": -18.286400000000015,
+    "feature_type": null,
+    "raw_name": "Copernicus H"
+  },
+  "copernicus j": {
+    "body": "Moon",
+    "lat": 10.129,
+    "lon": -23.9387,
+    "lon_180": -23.93870000000001,
+    "feature_type": null,
+    "raw_name": "Copernicus J"
+  },
+  "copernicus l": {
+    "body": "Moon",
+    "lat": 13.4844,
+    "lon": -17.0843,
+    "lon_180": -17.084299999999985,
+    "feature_type": null,
+    "raw_name": "Copernicus L"
+  },
+  "copernicus n": {
+    "body": "Moon",
+    "lat": 6.9132,
+    "lon": -23.3111,
+    "lon_180": -23.31110000000001,
+    "feature_type": null,
+    "raw_name": "Copernicus N"
+  },
+  "copernicus p": {
+    "body": "Moon",
+    "lat": 10.1093,
+    "lon": -16.0586,
+    "lon_180": -16.058600000000013,
+    "feature_type": null,
+    "raw_name": "Copernicus P"
+  },
+  "copernicus r": {
+    "body": "Moon",
+    "lat": 8.0598,
+    "lon": -16.8433,
+    "lon_180": -16.8433,
+    "feature_type": null,
+    "raw_name": "Copernicus R"
+  },
+  "descartes a": {
+    "body": "Moon",
+    "lat": -12.0821,
+    "lon": 15.1935,
+    "lon_180": 15.1935,
+    "feature_type": null,
+    "raw_name": "Descartes A"
+  },
+  "descartes c": {
+    "body": "Moon",
+    "lat": -11.0182,
+    "lon": 16.3036,
+    "lon_180": 16.30359999999999,
+    "feature_type": null,
+    "raw_name": "Descartes C"
+  },
+  "fra mauro k": {
+    "body": "Moon",
+    "lat": -2.537,
+    "lon": -16.8041,
+    "lon_180": -16.804100000000005,
+    "feature_type": null,
+    "raw_name": "Fra Mauro K"
+  },
+  "fra mauro x": {
+    "body": "Moon",
+    "lat": -4.4676,
+    "lon": -17.3276,
+    "lon_180": -17.32759999999999,
+    "feature_type": null,
+    "raw_name": "Fra Mauro X"
+  },
+  "fra mauro y": {
+    "body": "Moon",
+    "lat": -4.105,
+    "lon": -16.7414,
+    "lon_180": -16.7414,
+    "feature_type": null,
+    "raw_name": "Fra Mauro Y"
+  },
+  "fra mauro w": {
+    "body": "Moon",
+    "lat": -1.3268,
+    "lon": -16.8276,
+    "lon_180": -16.82759999999999,
+    "feature_type": null,
+    "raw_name": "Fra Mauro W"
+  },
+  "fra mauro n": {
+    "body": "Moon",
+    "lat": -5.3531,
+    "lon": -17.4619,
+    "lon_180": -17.461900000000014,
+    "feature_type": null,
+    "raw_name": "Fra Mauro N"
+  },
+  "fra mauro g": {
+    "body": "Moon",
+    "lat": -2.2104,
+    "lon": -16.3322,
+    "lon_180": -16.3322,
+    "feature_type": null,
+    "raw_name": "Fra Mauro G"
+  },
+  "fra mauro p": {
+    "body": "Moon",
+    "lat": -5.4429,
+    "lon": -16.5426,
+    "lon_180": -16.542599999999993,
+    "feature_type": null,
+    "raw_name": "Fra Mauro P"
+  },
+  "fra mauro a": {
+    "body": "Moon",
+    "lat": -5.4672,
+    "lon": -20.9634,
+    "lon_180": -20.963400000000007,
+    "feature_type": null,
+    "raw_name": "Fra Mauro A"
+  },
+  "fra mauro b": {
+    "body": "Moon",
+    "lat": -4.0266,
+    "lon": -21.6962,
+    "lon_180": -21.696200000000005,
+    "feature_type": null,
+    "raw_name": "Fra Mauro B"
+  },
+  "fra mauro c": {
+    "body": "Moon",
+    "lat": -5.4466,
+    "lon": -21.6929,
+    "lon_180": -21.69290000000001,
+    "feature_type": null,
+    "raw_name": "Fra Mauro C"
+  },
+  "fra mauro h": {
+    "body": "Moon",
+    "lat": -4.1487,
+    "lon": -15.5821,
+    "lon_180": -15.582099999999997,
+    "feature_type": null,
+    "raw_name": "Fra Mauro H"
+  },
+  "fra mauro d": {
+    "body": "Moon",
+    "lat": -4.8184,
+    "lon": -17.6233,
+    "lon_180": -17.6233,
+    "feature_type": null,
+    "raw_name": "Fra Mauro D"
+  },
+  "fra mauro e": {
+    "body": "Moon",
+    "lat": -5.9998,
+    "lon": -16.8265,
+    "lon_180": -16.82650000000001,
+    "feature_type": null,
+    "raw_name": "Fra Mauro E"
+  },
+  "fra mauro f": {
+    "body": "Moon",
+    "lat": -6.7291,
+    "lon": -16.9652,
+    "lon_180": -16.96520000000001,
+    "feature_type": null,
+    "raw_name": "Fra Mauro F"
+  },
+  "hadley c": {
+    "body": "Moon",
+    "lat": 25.483,
+    "lon": 2.8035,
+    "lon_180": 2.803500000000014,
+    "feature_type": null,
+    "raw_name": "Hadley C"
+  },
+  "littrow a": {
+    "body": "Moon",
+    "lat": 22.3036,
+    "lon": 32.1887,
+    "lon_180": 32.18869999999998,
+    "feature_type": null,
+    "raw_name": "Littrow A"
+  },
+  "littrow d": {
+    "body": "Moon",
+    "lat": 23.6968,
+    "lon": 32.8146,
+    "lon_180": 32.814599999999984,
+    "feature_type": null,
+    "raw_name": "Littrow D"
+  },
+  "littrow f": {
+    "body": "Moon",
+    "lat": 21.9688,
+    "lon": 34.1204,
+    "lon_180": 34.12039999999999,
+    "feature_type": null,
+    "raw_name": "Littrow F"
+  },
+  "littrow p": {
+    "body": "Moon",
+    "lat": 23.2043,
+    "lon": 32.8779,
+    "lon_180": 32.87790000000001,
+    "feature_type": null,
+    "raw_name": "Littrow P"
+  },
+  "taurus-littrow valley": {
+    "body": "Moon",
+    "lat": 20.0702,
+    "lon": 30.7867,
+    "lon_180": 30.786699999999996,
+    "feature_type": null,
+    "raw_name": "Taurus-Littrow Valley"
+  },
+  "mount marilyn": {
+    "body": "Moon",
+    "lat": 1.13,
+    "lon": 40.0,
+    "lon_180": 40.0,
+    "feature_type": null,
+    "raw_name": "Mount Marilyn"
+  }
+}
