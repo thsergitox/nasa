@@ -4,7 +4,7 @@ import * as Cesium from 'cesium';
 export type CelestialBody = 'earth' | 'moon' | 'mars';
 
 // Configuración para cada proveedor WMTS
-export const createEarthProvider = (date?: Date) => {
+export const createEarthProvider = () => {
   // NASA GIBS para Tierra - MODIS True Color de alta resolución
   // Volviendo a MODIS que funciona bien y tiene buena resolución
   return new Cesium.WebMapTileServiceImageryProvider({
@@ -78,10 +78,10 @@ export const createHighResMarsProvider = () => {
 };
 
 // Función helper para obtener el provider según el cuerpo celeste
-export const getProviderForBody = (body: CelestialBody, date?: Date) => {
+export const getProviderForBody = (body: CelestialBody) => {
   switch (body) {
     case 'earth':
-      return createEarthProvider(date);
+      return createEarthProvider();
     case 'moon':
       return createMoonProvider();
     case 'mars':
