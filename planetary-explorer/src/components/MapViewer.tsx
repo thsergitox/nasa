@@ -23,15 +23,19 @@ interface GeologicalFeature {
 interface MapViewerProps {
   currentBody: CelestialBody;
   is3DMode: boolean;
-  currentPage: 'main' | 'feature-detail';
+  currentPage: 'main' | 'feature-detail' | 'moon-data';
   selectedFeature: GeologicalFeature | null;
+  onNavigateToMoonData: () => void;
+  onNavigateToMain: () => void;
 }
 
 const MapViewer: React.FC<MapViewerProps> = ({ 
   currentBody, 
   is3DMode, 
   currentPage, 
-  selectedFeature
+  selectedFeature, 
+  onNavigateToMoonData,
+  onNavigateToMain
 }) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
@@ -51,6 +55,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
   const [currentCameraPosition, setCurrentCameraPosition] = useState<{lat: number, lon: number} | null>(null);
   const [cameraHeight, setCameraHeight] = useState<number>(0);
   const [showLunarTour, setShowLunarTour] = useState(false);
+
 
   // Função para aplicar filtros inteligentes
   const applySmartFilters = (filters: string[]) => {
@@ -125,14 +130,8 @@ const MapViewer: React.FC<MapViewerProps> = ({
     setCategoryResults(filteredFeatures);
   };
 
-
   // Função para lidar com clique em uma feature específica
   const handleFeatureClick = (feature: GazetteerFeature) => {
-    // Fechar o submenu
-    setShowDataSubmenu(false);
-    setSelectedDataCategory('');
-    setDataSearchTerm('');
-    
     // Navegar para a feature selecionada
     flyToLocation(feature);
     
@@ -143,6 +142,45 @@ const MapViewer: React.FC<MapViewerProps> = ({
     setSearchTerm(feature.properties.name || '');
   };
 
+  // Função para filtrar opções de dados baseada na busca
+  const getFilteredDataOptions = () => {
+    const options = [];
+    
+    if (currentBody === 'earth') {
+      // Terra - opções temporariamente ocultas
+      return [];
+    }
+    
+    if (currentBody === 'moon') {
+      options.push(
+        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌙' },
+        { key: 'maria', label: 'Lunar Maria', description: 'Planícies de lava basáltica', icon: '🌊' },
+        { key: 'rilles', label: 'Rilles & Valleys', description: 'Rilles e vales lunares', icon: '🌊' }
+      );
+    }
+    
+    if (currentBody === 'mars') {
+      options.push(
+        { key: 'volcanoes', label: 'Volcanoes', description: 'Vulcões marcianos', icon: '🌋' },
+        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌙' },
+        { key: 'canyons', label: 'Canyons', description: 'Sistema Valles Marineris', icon: '🏔️' },
+        { key: 'mountains', label: 'Mountains', description: 'Montanhas marcianas', icon: '⛰️' },
+        { key: 'polar', label: 'Polar Caps', description: 'Calotas polares', icon: '🧊' }
+      );
+    }
+    
+    // Filtrar baseado no termo de busca
+    if (!dataSearchTerm.trim()) {
+      return options;
+    }
+    
+    const searchLower = dataSearchTerm.toLowerCase();
+    return options.filter(option => 
+      option.label.toLowerCase().includes(searchLower) ||
+      option.description.toLowerCase().includes(searchLower) ||
+      option.key.toLowerCase().includes(searchLower)
+    );
+  };
 
   // Função para obter informações detalhadas de uma feature
   const getFeatureDetails = (featureName: string, body: CelestialBody): any => {
@@ -239,45 +277,6 @@ const MapViewer: React.FC<MapViewerProps> = ({
     return featureDetails[body]?.[featureName] || null;
   };
 
-  // Função para filtrar opções de dados baseada na busca
-  const getFilteredDataOptions = () => {
-    const options = [];
-    
-    if (currentBody === 'earth') {
-      // Terra - opções temporariamente ocultas
-      return [];
-    }
-    
-    if (currentBody === 'moon') {
-      options.push(
-        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌑' },
-        { key: 'maria', label: 'Lunar Maria', description: 'Planícies de lava basáltica', icon: '🌊' },
-        { key: 'rilles', label: 'Rilles & Valleys', description: 'Rilles e vales lunares', icon: '🌊' }
-      );
-    }
-    
-    if (currentBody === 'mars') {
-      options.push(
-        { key: 'volcanoes', label: 'Volcanoes', description: 'Vulcões marcianos', icon: '🌋' },
-        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌑' },
-        { key: 'canyons', label: 'Canyons', description: 'Sistema Valles Marineris', icon: '🏔️' },
-        { key: 'mountains', label: 'Mountains', description: 'Montanhas marcianas', icon: '⛰️' },
-        { key: 'polar', label: 'Polar Caps', description: 'Calotas polares', icon: '🧊' }
-      );
-    }
-    
-    // Filtrar baseado no termo de busca
-    if (!dataSearchTerm.trim()) {
-      return options;
-    }
-    
-    const searchLower = dataSearchTerm.toLowerCase();
-    return options.filter(option => 
-      option.label.toLowerCase().includes(searchLower) ||
-      option.description.toLowerCase().includes(searchLower) ||
-      option.key.toLowerCase().includes(searchLower)
-    );
-  };
 
   // Geological features data by celestial body - Temporarily disabled
   /*
@@ -329,7 +328,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
         return [
           { 
             name: 'Tycho Crater', 
-            icon: '🌑', 
+            icon: '🌙', 
             type: 'crater', 
             description: 'Prominent lunar impact crater', 
             coordinates: '43.3°S, 11.2°W',
@@ -342,7 +341,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
           },
           { 
             name: 'Copernicus Crater', 
-            icon: '🌑', 
+            icon: '🌙', 
             type: 'crater', 
             description: 'Large lunar impact crater', 
             coordinates: '9.6°N, 20.1°W',
@@ -355,7 +354,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
           },
           { 
             name: 'Mare Tranquillitatis', 
-            icon: '🌑', 
+            icon: '🌙', 
             type: 'mare', 
             description: 'Sea of Tranquility', 
             coordinates: '8.5°N, 31.4°E',
@@ -384,7 +383,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
           },
           { 
             name: 'Gale Crater', 
-            icon: '🌑', 
+            icon: '🌙', 
             type: 'crater', 
             description: 'Impact crater explored by Curiosity', 
             coordinates: '5.4°S, 137.8°E',
@@ -474,7 +473,9 @@ const MapViewer: React.FC<MapViewerProps> = ({
 
   // Cargar datos del gazetteer cuando cambia el cuerpo celeste
   useEffect(() => {
+    console.log('MapViewer: Loading gazetteer data for:', currentBody);
     loadGazetteerData(currentBody).then(data => {
+      console.log('MapViewer: Gazetteer data loaded:', data.features.length, 'features');
       const validFeatures = data.features.filter(isValidFeature);
 
       setGazetteerData(validFeatures);
@@ -488,6 +489,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
     });
 
     // Actualizar provider
+    console.log('MapViewer: Setting provider for:', currentBody);
     setProvider(getProviderForBody(currentBody));
   }, [currentBody]);
 
@@ -598,17 +600,108 @@ const MapViewer: React.FC<MapViewerProps> = ({
     });
   };
 
+  // Escutar mudanças na prop onFeatureSelect para voar para a feature
+  useEffect(() => {
+    // Esta função será chamada quando uma feature for selecionada externamente
+    const handleExternalFeatureSelect = (feature: GazetteerFeature) => {
+      flyToLocation(feature);
+    };
+    
+    // Expor a função globalmente para uso externo
+    (window as any).flyToFeature = handleExternalFeatureSelect;
+  }, []);
+
   const selectedPosition = selectedGazetteerFeature ? getFeaturePosition(selectedGazetteerFeature) : null;
   const hoveredPosition = hoveredFeature ? getFeaturePosition(hoveredFeature) : null;
 
   return (
     <div className="map-viewer-container">
+      {/* Cesium Viewer */}
+      <Viewer
+        ref={e => { viewerRef.current = e?.cesiumElement || null; }}
+        full
+        scene3DOnly={false}
+        homeButton={false}
+        sceneModePicker={false}
+        baseLayerPicker={false}
+        navigationHelpButton={false}
+        animation={false}
+        timeline={false}
+        fullscreenButton={false}
+        vrButton={false}
+        shouldAnimate={false}
+        requestRenderMode={true}
+        maximumRenderTimeChange={Infinity}
+      >
+        <ImageryLayer imageryProvider={provider} />
+        
+        {/* Mostrar pontos do gazetteer */}
+        {visiblePoints.map((feature, index) => {
+          const position = getFeaturePosition(feature);
+          if (!position) {
+            return null;
+          }
+
+          const isSelected = selectedGazetteerFeature?.properties.name === feature.properties.name;
+          const isHovered = hoveredFeature?.properties.name === feature.properties.name;
+          return (
+            <Entity
+              key={`${currentBody}-${index}`}
+              position={Cesium.Cartesian3.fromDegrees(position.lon180, position.lat)}
+              point={{
+                pixelSize: isSelected ? 15 : isHovered ? 12 : 5,
+                color: isSelected || isHovered ? Cesium.Color.RED : Cesium.Color.YELLOW.withAlpha(0.7),
+                outlineColor: isSelected || isHovered ? Cesium.Color.WHITE : Cesium.Color.ORANGE.withAlpha(0.5),
+                outlineWidth: isSelected || isHovered ? 3 : 1,
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+              }}
+              onMouseEnter={() => setHoveredFeature(feature)}
+              onMouseLeave={() => setHoveredFeature(null)}
+              onClick={() => {
+                setSelectedGazetteerFeature(feature);
+                flyToLocation(feature);
+              }}
+            />
+          );
+        })}
+
+        {/* Etiqueta para o ponto selecionado ou hover */}
+        {(selectedPosition || hoveredPosition) && (() => {
+          const labelFeature = selectedGazetteerFeature ?? hoveredFeature;
+          const labelPosition = selectedPosition ?? hoveredPosition;
+
+          if (!labelFeature || !labelPosition) {
+            return null;
+          }
+
+          return (
+            <Entity
+              position={Cesium.Cartesian3.fromDegrees(labelPosition.lon180, labelPosition.lat)}
+              label={{
+                text: labelFeature.properties.name,
+                font: selectedGazetteerFeature ? '14pt sans-serif' : '12pt sans-serif',
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -20),
+                fillColor: selectedGazetteerFeature ? Cesium.Color.WHITE : Cesium.Color.YELLOW,
+                outlineColor: selectedGazetteerFeature ? Cesium.Color.BLACK : Cesium.Color.RED.withAlpha(0.8),
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                disableDepthTestDistance: Number.POSITIVE_INFINITY
+              }}
+            />
+          );
+        })()}
+      </Viewer>
+
       {/* System Menu - Only show on main page */}
       {currentPage === 'main' && (
       <div className="system-menu">
         <div className="menu-header">
+          <div className="menu-title-section">
           <h2 className="menu-title">{currentBody.charAt(0).toUpperCase() + currentBody.slice(1)} Menu</h2>
           <div className="menu-section">General</div>
+          </div>
         </div>
         <div className="menu-items">
           <button 
@@ -628,281 +721,53 @@ const MapViewer: React.FC<MapViewerProps> = ({
               }
             }}
           >
-            <span className="menu-icon">🏠</span>
+            <div className="menu-item-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              </svg>
+                </div>
+            <div className="menu-item-content">
             <span className="menu-text">Home</span>
+              <span className="menu-description">Global view</span>
+            </div>
           </button>
           <button 
             className="menu-item"
             onClick={() => setShowLunarTour(!showLunarTour)}
           >
-            <span className="menu-icon">🗺️</span>
+            <div className="menu-item-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div className="menu-item-content">
             <span className="menu-text">Moon Tour</span>
+              <span className="menu-description">Apollo missions</span>
+                        </div>
           </button>
           <div className="menu-item-container">
             <button 
               className="menu-item"
               onClick={() => {
-                setShowDataSubmenu(!showDataSubmenu);
-                if (!showDataSubmenu) {
-                  setDataSearchTerm(''); // Clear search when opening
-                  setSelectedDataCategory(''); // Clear selected category
-                  setCategoryResults([]); // Clear category results
-                  setSelectedFilters([]); // Clear selected filters
-                }
+                onNavigateToMoonData();
               }}
             >
-              <span className="menu-icon">📊</span>
+              <div className="menu-item-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                </svg>
+                    </div>
+              <div className="menu-item-content">
               <span className="menu-text">Moon Data</span>
-              <span className={`menu-arrow ${showDataSubmenu ? 'rotated' : ''}`}>›</span>
-            </button>
-            
-            {/* Submenu de características geológicas */}
-            {showDataSubmenu && (
-              <div className="submenu">
-                {/* Campo de busca - Temporariamente oculto */}
-                {/* <div className="submenu-search">
-                  <input
-                    type="text"
-                    value={dataSearchTerm}
-                    onChange={(e) => {
-                      setDataSearchTerm(e.target.value);
-                      // Se o usuário digitar algo, também filtrar dados do gazetteer
-                      if (e.target.value.trim()) {
-                        handleDirectSearch(e.target.value);
-                      } else {
-                        // Se campo estiver vazio, limpar resultados
-                        setSearchResults([]);
-                        setVisiblePoints(gazetteerData.slice(0, currentBody === 'earth' ? 500 : 1000));
-                        setShowAllPoints(true);
-                        setSearchTerm('');
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      // Se pressionar Enter, executar busca direta
-                      if (e.key === 'Enter' && dataSearchTerm.trim()) {
-                        handleDirectSearch(dataSearchTerm);
-                        setShowDataSubmenu(false);
-                      }
-                    }}
-                    placeholder={`Buscar características de ${currentBody === 'earth' ? 'Terra' : currentBody === 'moon' ? 'Lua' : 'Marte'}...`}
-                    className="submenu-search-input"
-                  />
-                </div> */}
-
-                {/* Opções de dados personalizadas por corpo celeste */}
-                <div className="submenu-content">
-                  {!selectedDataCategory ? (
-                    // Mostrar filtros inteligentes como chips
-                    <>
-                      <div className="filters-section">
-                        <div className="filters-title">Select Features</div>
-                        <div className="filters-chips">
-                          {getFilteredDataOptions().map((option, index) => (
-                      <button
-                              key={index} 
-                              className={`filter-chip ${selectedFilters.includes(option.key) ? 'active' : ''}`}
-                              onClick={() => {
-                                const newFilters = selectedFilters.includes(option.key)
-                                  ? selectedFilters.filter(f => f !== option.key)
-                                  : [...selectedFilters, option.key];
-                                setSelectedFilters(newFilters);
-                                applySmartFilters(newFilters);
-                              }}
-                            >
-                              <span className="filter-chip-icon">{option.icon}</span>
-                              <span className="filter-chip-text">{option.label}</span>
-                        </button>
-                      ))}
+                <span className="menu-description">Geological features</span>
                 </div>
-
-                        {selectedFilters.length > 0 && (
-                          <div className="filters-actions">
-                      <button
-                              className="filter-action-btn"
-                              onClick={() => {
-                                setSelectedFilters([]);
-                                setCategoryResults([]);
-                              }}
-                            >
-                              Clear Filters
                       </button>
-                            <span className="filter-count">
-                              {categoryResults.length} result{categoryResults.length !== 1 ? 's' : ''}
-                            </span>
                   </div>
-                        )}
                 </div>
-
-                      {/* Lista de resultados quando filtros estão ativos */}
-                      {selectedFilters.length > 0 && (
-                        <div className="filtered-results">
-                          <div className="results-title">Results Found</div>
-                          {categoryResults.slice(0, 10).map((feature, index) => (
-                        <button
-                        key={index} 
-                              className="submenu-item submenu-feature-item"
-                              onClick={() => handleFeatureClick(feature)}
-                      >
-                              <span className="submenu-icon">📍</span>
-                        <div className="submenu-item-content">
-                                <span className="submenu-text">{feature.properties.name}</span>
-                                <span className="submenu-description">
-                                  {feature.properties.feature_type || 'Geological feature'}
-                                </span>
-                              </div>
-                        </button>
-                      ))}
-                          
-                          {categoryResults.length > 10 && (
-                            <div className="results-more">
-                              +{categoryResults.length - 10} more results
-                    </div>
-                          )}
                   </div>
                       )}
                       
-                      {/* Feedback da busca direta - Temporariamente oculto */}
-                      
-                      
-                      {getFilteredDataOptions().length === 0 && !dataSearchTerm.trim() && currentBody === 'earth' && (
-                        <div className="submenu-no-results">
-                          <span>Earth options temporarily unavailable</span>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    // Mostrar lista de features quando uma categoria está selecionada
-                    <>
-                      <div className="submenu-header">
-                        <button 
-                          className="submenu-back-button"
-                          onClick={() => {
-                            setSelectedDataCategory('');
-                            setCategoryResults([]);
-                          }}
-                        >
-                          ← Back
-                        </button>
-                        <span className="submenu-category-title">
-                          {getFilteredDataOptions().find(opt => opt.key === selectedDataCategory)?.label}
-                        </span>
-                </div>
-
-                      {categoryResults.map((feature, index) => (
-                      <button 
-                        key={index} 
-                          className="submenu-item submenu-feature-item"
-                          onClick={() => handleFeatureClick(feature)}
-                      >
-                          <span className="submenu-icon">📍</span>
-                        <div className="submenu-item-content">
-                            <span className="submenu-text">{feature.properties.name}</span>
-                            <span className="submenu-description">
-                              {feature.properties.feature_type || 'Geological feature'}
-                            </span>
-                        </div>
-                      </button>
-                      ))}
-                      
-                      {categoryResults.length === 0 && (
-                        <div className="submenu-no-results">
-                          <span>No features found in this category</span>
-                    </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      )}
-
-      {/* Feature Information Panel - Only show on main page */}
-      {currentPage === 'main' && selectedGazetteerFeature && (
-        <div className="feature-info-panel">
-          <div className="feature-info-header">
-            <h3 className="feature-info-title">
-              <span className="feature-info-icon">📍</span>
-              {selectedGazetteerFeature.properties.name}
-            </h3>
-            <button 
-              className="feature-info-close"
-              onClick={() => setSelectedGazetteerFeature(null)}
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div className="feature-info-content">
-            {(() => {
-              const featureName = selectedGazetteerFeature.properties.name;
-              const featureDetails = getFeatureDetails(featureName, currentBody);
-              
-              if (featureDetails) {
-                return (
-                  <>
-            <div className="feature-description">
-                      <p><strong>{featureDetails.description}</strong></p>
-                      <p>{featureDetails.detailedDescription}</p>
-            </div>
-            
-            <div className="feature-data">
-                      {featureDetails.data.map((item: any, index: number) => (
-                <div key={index} className="data-item">
-                  <span className="data-label">{item.label}:</span>
-                  <span className="data-value">{item.value}</span>
-                </div>
-              ))}
-                      
-                      <div className="data-item">
-                        <span className="data-label">Latitude:</span>
-                        <span className="data-value">{selectedPosition ? `${selectedPosition.lat.toFixed(4)}°` : 'N/A'}</span>
-                      </div>
-                      <div className="data-item">
-                        <span className="data-label">Longitude:</span>
-                        <span className="data-value">{selectedPosition ? `${selectedPosition.lon180.toFixed(4)}°` : 'N/A'}</span>
-                      </div>
-                      {selectedGazetteerFeature.properties.feature_type && (
-                        <div className="data-item">
-                          <span className="data-label">Type:</span>
-                          <span className="data-value">{selectedGazetteerFeature.properties.feature_type}</span>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                );
-              } else {
-                return (
-                  <>
-                    <div className="feature-description">
-                      <p>Gazetteer location on {currentBody}</p>
-            </div>
-            
-                    <div className="feature-data">
-                      <div className="data-item">
-                        <span className="data-label">Latitude:</span>
-                        <span className="data-value">{selectedPosition ? `${selectedPosition.lat.toFixed(4)}°` : 'N/A'}</span>
-            </div>
-                      <div className="data-item">
-                        <span className="data-label">Longitude:</span>
-                        <span className="data-value">{selectedPosition ? `${selectedPosition.lon180.toFixed(4)}°` : 'N/A'}</span>
-                      </div>
-                      {selectedGazetteerFeature.properties.feature_type && (
-                        <div className="data-item">
-                          <span className="data-label">Type:</span>
-                          <span className="data-value">{selectedGazetteerFeature.properties.feature_type}</span>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                );
-              }
-            })()}
-          </div>
-        </div>
-      )}
+      {/* Feature Information Panel - Removed from main page */}
 
       {/* Search Panel - Only show on main page */}
       {currentPage === 'main' && (
