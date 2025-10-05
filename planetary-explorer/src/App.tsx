@@ -432,9 +432,11 @@ const App: React.FC = () => {
                   is3DMode={is3DMode}
                   currentPage={currentPage}
                   selectedFeature={selectedFeature}
+                  selectedGazetteerFeature={selectedGazetteerFeature}
                   onNavigateToMoonData={() => setCurrentPage('moon-data')}
                   onNavigateToMain={() => setCurrentPage('main')}
                   onNavigateToMoonTour={() => setCurrentPage('moon-tour-map')}
+                  onFeatureSelect={setSelectedGazetteerFeature}
                 />
               </div>
 

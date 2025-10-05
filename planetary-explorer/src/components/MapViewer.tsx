@@ -30,9 +30,11 @@ interface MapViewerProps {
   is3DMode: boolean;
   currentPage: 'main' | 'feature-detail' | 'moon-data' | 'moon-tour' | 'moon-tour-map';
   selectedFeature: GeologicalFeature | null;
+  selectedGazetteerFeature?: GazetteerFeature | null;
   onNavigateToMoonData: () => void;
   onNavigateToMain: () => void;
   onNavigateToMoonTour?: () => void;
+  onFeatureSelect?: (feature: GazetteerFeature | null) => void;
 }
 
 const MapViewer: React.FC<MapViewerProps> = ({ 
@@ -40,14 +42,27 @@ const MapViewer: React.FC<MapViewerProps> = ({
   is3DMode, 
   currentPage, 
   selectedFeature, 
+  selectedGazetteerFeature: externalSelectedGazetteerFeature,
   onNavigateToMoonData,
   onNavigateToMain,
-  onNavigateToMoonTour
+  onNavigateToMoonTour,
+  onFeatureSelect
 }) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
   const [gazetteerData, setGazetteerData] = useState<GazetteerFeature[]>([]);
-  const [selectedGazetteerFeature, setSelectedGazetteerFeature] = useState<GazetteerFeature | null>(null);
+  const [internalSelectedGazetteerFeature, setInternalSelectedGazetteerFeature] = useState<GazetteerFeature | null>(null);
+  
+  // Usar o estado externo se disponível, senão usar o interno
+  const selectedGazetteerFeature = externalSelectedGazetteerFeature !== undefined ? externalSelectedGazetteerFeature : internalSelectedGazetteerFeature;
+  
+  const setSelectedGazetteerFeature = (feature: GazetteerFeature | null) => {
+    if (onFeatureSelect) {
+      onFeatureSelect(feature);
+    } else {
+      setInternalSelectedGazetteerFeature(feature);
+    }
+  };
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<GazetteerFeature[]>([]);
   const [showSearch, setShowSearch] = useState(false);
