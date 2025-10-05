@@ -25,14 +25,71 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
   const [visiblePoints, setVisiblePoints] = useState<GazetteerFeature[]>([]);
   const [hoveredFeature, setHoveredFeature] = useState<GazetteerFeature | null>(null);
 
+  const getFeatureLongitude = (feature: GazetteerFeature): number | undefined => {
+    const lonFromGeometry = feature.geometry?.coordinates?.[0];
+    if (typeof lonFromGeometry === 'number' && Number.isFinite(lonFromGeometry)) {
+      return lonFromGeometry;
+    }
+
+    const lonWest = feature.properties?.lon_westneg_180;
+    if (typeof lonWest === 'number' && Number.isFinite(lonWest)) {
+      return lonWest;
+    }
+
+    const lonEast = feature.properties?.lon_east_0_360;
+    if (typeof lonEast === 'number' && Number.isFinite(lonEast)) {
+      return lonEast;
+    }
+
+    return undefined;
+  };
+
+  const getFeatureLatitude = (feature: GazetteerFeature): number | undefined => {
+    const latProp = feature.properties?.lat;
+    if (typeof latProp === 'number' && Number.isFinite(latProp)) {
+      return latProp;
+    }
+
+    const latFromGeometry = feature.geometry?.coordinates?.[1];
+    if (typeof latFromGeometry === 'number' && Number.isFinite(latFromGeometry)) {
+      return latFromGeometry;
+    }
+
+    return undefined;
+  };
+
+  const getFeaturePosition = (feature: GazetteerFeature) => {
+    const lon = getFeatureLongitude(feature);
+    const lat = getFeatureLatitude(feature);
+
+    if (typeof lon !== 'number' || !Number.isFinite(lon) || typeof lat !== 'number' || !Number.isFinite(lat)) {
+      return null;
+    }
+
+    return {
+      lon,
+      lat,
+      lon180: convertLonTo180(lon)
+    };
+  };
+
+  const isValidFeature = (feature: GazetteerFeature): boolean => {
+    const lon = getFeatureLongitude(feature);
+    const lat = getFeatureLatitude(feature);
+
+    return typeof lat === 'number' && Number.isFinite(lat) && typeof lon === 'number' && Number.isFinite(lon);
+  };
+
   // Cargar datos del gazetteer cuando cambia el cuerpo celeste
   useEffect(() => {
     loadGazetteerData(currentBody).then(data => {
-      setGazetteerData(data.features);
+      const validFeatures = data.features.filter(isValidFeature);
+
+      setGazetteerData(validFeatures);
       // Limitar puntos visibles para no sobrecargar el renderizado
       // Para la Luna hay ~9000 puntos, mostramos solo una muestra
       const maxPoints = currentBody === 'earth' ? 500 : 1000;
-      setVisiblePoints(data.features.slice(0, maxPoints));
+      setVisiblePoints(validFeatures.slice(0, maxPoints));
       setSelectedFeature(null);
       setSearchTerm('');
       setSearchResults([]);
@@ -59,8 +116,10 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
     if (!viewerRef.current) return;
 
     const viewer = viewerRef.current;
-    const lon180 = convertLonTo180(feature.geometry.coordinates[0]);
-    const lat = feature.properties.lat;
+    const position = getFeaturePosition(feature);
+    if (!position) {
+      return;
+    }
 
     // Cerrar búsqueda
     setShowSearch(false);
@@ -68,7 +127,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
 
     // Volar al punto
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(lon180, lat, 500000),
+      destination: Cesium.Cartesian3.fromDegrees(position.lon180, position.lat, 500000),
       duration: 2.0,
       orientation: {
         heading: 0,
@@ -77,6 +136,9 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
       }
     });
   };
+
+  const selectedPosition = selectedFeature ? getFeaturePosition(selectedFeature) : null;
+  const hoveredPosition = hoveredFeature ? getFeaturePosition(hoveredFeature) : null;
 
   return (
     <div className="map-viewer-container">
@@ -112,18 +174,27 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
         {/* Search Results */}
         {showSearch && searchResults.length > 0 && (
           <div className="search-results">
-            {searchResults.map((feature, index) => (
-              <button
-                key={index}
-                onClick={() => flyToLocation(feature)}
-                className="search-result-item"
-              >
-                <div className="result-name">{feature.properties.name}</div>
-                <div className="result-coords">
-                  {feature.properties.lat.toFixed(4)}°, {convertLonTo180(feature.geometry.coordinates[0]).toFixed(4)}°
-                </div>
-              </button>
-            ))}
+            {searchResults.map((feature, index) => {
+              const lon = getFeatureLongitude(feature);
+              const lat = getFeatureLatitude(feature);
+
+              if (typeof lon !== 'number' || typeof lat !== 'number') {
+                return null;
+              }
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => flyToLocation(feature)}
+                  className="search-result-item"
+                >
+                  <div className="result-name">{feature.properties.name}</div>
+                  <div className="result-coords">
+                    {lat.toFixed(4)}°, {convertLonTo180(lon).toFixed(4)}°
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -143,11 +214,15 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
             <div className="feature-details">
               <div className="detail-item">
                 <span className="detail-label">Latitude</span>
-                <span className="detail-value">{selectedFeature.properties.lat.toFixed(4)}°</span>
+                <span className="detail-value">
+                  {selectedPosition ? `${selectedPosition.lat.toFixed(4)}°` : 'N/A'}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Longitude</span>
-                <span className="detail-value">{convertLonTo180(selectedFeature.geometry.coordinates[0]).toFixed(4)}°</span>
+                <span className="detail-value">
+                  {selectedPosition ? `${selectedPosition.lon180.toFixed(4)}°` : 'N/A'}
+                </span>
               </div>
               {selectedFeature.properties.feature_type && (
                 <div className="detail-item">
@@ -200,15 +275,17 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
         
         {/* Mostrar todos los puntos del gazetteer */}
         {showAllPoints && visiblePoints.map((feature, index) => {
+          const position = getFeaturePosition(feature);
+          if (!position) {
+            return null;
+          }
+
           const isSelected = selectedFeature?.properties.name === feature.properties.name;
           const isHovered = hoveredFeature?.properties.name === feature.properties.name;
           return (
             <Entity
               key={`${currentBody}-${index}`}
-              position={Cesium.Cartesian3.fromDegrees(
-                convertLonTo180(feature.geometry.coordinates[0]),
-                feature.properties.lat
-              )}
+              position={Cesium.Cartesian3.fromDegrees(position.lon180, position.lat)}
               point={{
                 pixelSize: isSelected ? 15 : isHovered ? 12 : 5,
                 color: isSelected || isHovered ? Cesium.Color.RED : Cesium.Color.YELLOW.withAlpha(0.7),
@@ -225,28 +302,34 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
             />
           );
         })}
-        
+
         {/* Etiqueta para el punto seleccionado o hover */}
-        {(selectedFeature || hoveredFeature) && (
-          <Entity
-            position={Cesium.Cartesian3.fromDegrees(
-              convertLonTo180((selectedFeature || hoveredFeature)!.geometry.coordinates[0]),
-              (selectedFeature || hoveredFeature)!.properties.lat
-            )}
-            label={{
-              text: (selectedFeature || hoveredFeature)!.properties.name,
-              font: selectedFeature ? '14pt sans-serif' : '12pt sans-serif',
-              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-              outlineWidth: 2,
-              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-              pixelOffset: new Cesium.Cartesian2(0, -20),
-              fillColor: selectedFeature ? Cesium.Color.WHITE : Cesium.Color.YELLOW,
-              outlineColor: selectedFeature ? Cesium.Color.BLACK : Cesium.Color.RED.withAlpha(0.8),
-              heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-              disableDepthTestDistance: Number.POSITIVE_INFINITY
-            }}
-          />
-        )}
+        {(selectedPosition || hoveredPosition) && (() => {
+          const labelFeature = selectedFeature ?? hoveredFeature;
+          const labelPosition = selectedPosition ?? hoveredPosition;
+
+          if (!labelFeature || !labelPosition) {
+            return null;
+          }
+
+          return (
+            <Entity
+              position={Cesium.Cartesian3.fromDegrees(labelPosition.lon180, labelPosition.lat)}
+              label={{
+                text: labelFeature.properties.name,
+                font: selectedFeature ? '14pt sans-serif' : '12pt sans-serif',
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -20),
+                fillColor: selectedFeature ? Cesium.Color.WHITE : Cesium.Color.YELLOW,
+                outlineColor: selectedFeature ? Cesium.Color.BLACK : Cesium.Color.RED.withAlpha(0.8),
+                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                disableDepthTestDistance: Number.POSITIVE_INFINITY
+              }}
+            />
+          );
+        })()}
         </Viewer>
       </div>
     </div>
