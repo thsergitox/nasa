@@ -123,44 +123,37 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* Body Selector */
-.body-selector {
-  display: flex;
-  gap: 8px;
-  background: var(--space-surface);
-  padding: 4px;
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--space-border);
-}
-
-.body-button {
+/* App Title */
+.app-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: transparent;
-  border: none;
-  border-radius: var(--border-radius);
-  color: var(--space-text-secondary);
-  font-weight: 500;
-  font-size: 14px;
-  transition: all var(--transition-normal);
-  cursor: pointer;
-}
-
-.body-button:hover {
-  background: var(--space-surface-hover);
-  color: var(--space-text-primary);
-}
-
-.body-button.active {
-  background: var(--space-accent);
-  color: white;
+  gap: 12px;
+  background: var(--space-surface);
+  padding: 8px 20px;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--space-border);
   box-shadow: var(--shadow-sm);
 }
 
-.body-icon {
-  font-size: 16px;
+.moon-icon {
+  font-size: 20px;
+  animation: moon-glow 3s ease-in-out infinite alternate;
+}
+
+.app-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--space-text-primary);
+  letter-spacing: 0.5px;
+}
+
+@keyframes moon-glow {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 5px rgba(74, 158, 255, 0.3));
+  }
+  100% {
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(74, 158, 255, 0.6));
+  }
 }
 
 .body-label {
@@ -1966,4 +1959,57 @@ input:focus-visible {
   color: #00d4ff;
   font-weight: bold;
   font-size: 11px;
+}
+
+/* Lunar Tour Start Button */
+.lunar-tour-start {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.tour-start-button {
+  background: var(--space-surface);
+  border: 2px solid var(--space-accent);
+  border-radius: var(--border-radius-lg);
+  padding: 12px 20px;
+  color: var(--space-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+}
+
+.tour-start-button:hover {
+  background: var(--space-accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.tour-start-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tour-start-text {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.tour-start-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.tour-start-icon svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
 }

@@ -15,23 +15,11 @@ interface GeologicalFeature {
 }
 
 const App: React.FC = () => {
-  const [currentBody, setCurrentBody] = useState<CelestialBody>('earth');
+  const [currentBody] = useState<CelestialBody>('moon');
   const [is3DMode, setIs3DMode] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   const [currentPage, setCurrentPage] = useState<'main' | 'feature-detail'>('main');
   const [selectedFeature, setSelectedFeature] = useState<GeologicalFeature | null>(null);
-
-  const celestialBodies: { key: CelestialBody; label: string; icon: string }[] = [
-    { key: 'earth', label: 'Earth', icon: '🌍' },
-    { key: 'moon', label: 'Moon', icon: '🌙' },
-    { key: 'mars', label: 'Mars', icon: '🔴' }
-  ];
-
-  // Função para navegar para detalhes da característica
-  const navigateToFeature = (feature: GeologicalFeature) => {
-    setSelectedFeature(feature);
-    setCurrentPage('feature-detail');
-  };
 
   // Função para voltar à página principal
   const navigateBack = () => {
@@ -57,21 +45,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="header-center">
-          {currentPage === 'main' ? (
-            <div className="body-selector">
-              {celestialBodies.map((body) => (
-                <button
-                  key={body.key}
-                  className={`body-button ${currentBody === body.key ? 'active' : ''}`}
-                  onClick={() => setCurrentBody(body.key)}
-                  title={`Switch to ${body.label}`}
-                >
-                  <span className="body-icon">{body.icon}</span>
-                  <span className="body-label">{body.label}</span>
-                </button>
-              ))}
-            </div>
-          ) : (
+          {currentPage === 'feature-detail' && (
             <div className="feature-header-title">
               <span className="feature-icon">{selectedFeature?.icon}</span>
               <span>{selectedFeature?.name}</span>
@@ -126,14 +100,8 @@ const App: React.FC = () => {
             </div>
             <div className="solar-system-view">
               <div className="sun">☀️</div>
-              <div className="orbit earth-orbit">
-                <div className={`planet earth ${currentBody === 'earth' ? 'active' : ''}`}>🌍</div>
-              </div>
               <div className="orbit moon-orbit">
                 <div className={`planet moon ${currentBody === 'moon' ? 'active' : ''}`}>🌙</div>
-              </div>
-              <div className="orbit mars-orbit">
-                <div className={`planet mars ${currentBody === 'mars' ? 'active' : ''}`}>🔴</div>
               </div>
             </div>
             <div className="planet-info">
@@ -141,17 +109,11 @@ const App: React.FC = () => {
               <div className="info-grid">
                 <div className="info-item">
                   <span className="label">Distance from Sun</span>
-                  <span className="value">
-                    {currentBody === 'earth' ? '149.6M km' : 
-                     currentBody === 'moon' ? '149.6M km' : '227.9M km'}
-                  </span>
+                  <span className="value">149.6M km</span>
                 </div>
                 <div className="info-item">
                   <span className="label">Diameter</span>
-                  <span className="value">
-                    {currentBody === 'earth' ? '12,742 km' : 
-                     currentBody === 'moon' ? '3,474 km' : '6,779 km'}
-                  </span>
+                  <span className="value">3,474 km</span>
                 </div>
               </div>
             </div>
@@ -187,7 +149,7 @@ const App: React.FC = () => {
               <h3>Features</h3>
               <ul>
                 <li><strong>Search:</strong> Find locations by name</li>
-                <li><strong>Body Selection:</strong> Switch between Earth, Moon, and Mars</li>
+                <li><strong>Moon Exploration:</strong> Explore lunar features and locations</li>
                 <li><strong>3D Mode:</strong> Toggle between 2D and 3D views</li>
               </ul>
             </div>

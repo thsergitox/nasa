@@ -50,6 +50,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [currentCameraPosition, setCurrentCameraPosition] = useState<{lat: number, lon: number} | null>(null);
   const [cameraHeight, setCameraHeight] = useState<number>(0);
+  const [showLunarTour, setShowLunarTour] = useState(false);
 
   // Função para aplicar filtros inteligentes
   const applySmartFilters = (filters: string[]) => {
@@ -610,9 +611,32 @@ const MapViewer: React.FC<MapViewerProps> = ({
           <div className="menu-section">General</div>
         </div>
         <div className="menu-items">
-          <button className="menu-item">
+          <button 
+            className="menu-item"
+            onClick={() => {
+              // Voltar para vista global da Lua
+              if (viewerRef.current) {
+                viewerRef.current.camera.flyTo({
+                  destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000),
+                  duration: 2.0,
+                  orientation: {
+                    heading: 0,
+                    pitch: Cesium.Math.toRadians(-90),
+                    roll: 0
+                  }
+                });
+              }
+            }}
+          >
+            <span className="menu-icon">🏠</span>
+            <span className="menu-text">Home</span>
+          </button>
+          <button 
+            className="menu-item"
+            onClick={() => setShowLunarTour(!showLunarTour)}
+          >
             <span className="menu-icon">🗺️</span>
-            <span className="menu-text">{currentBody === 'earth' ? 'Earth' : currentBody === 'moon' ? 'Moon' : 'Mars'} Tour</span>
+            <span className="menu-text">Moon Tour</span>
           </button>
           <div className="menu-item-container">
             <button 
@@ -628,7 +652,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
               }}
             >
               <span className="menu-icon">📊</span>
-              <span className="menu-text">{currentBody === 'earth' ? 'Earth' : currentBody === 'moon' ? 'Moon' : 'Mars'} Data</span>
+              <span className="menu-text">Moon Data</span>
               <span className={`menu-arrow ${showDataSubmenu ? 'rotated' : ''}`}>›</span>
             </button>
             
@@ -895,7 +919,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={`Search places on ${currentBody === 'earth' ? 'Earth' : currentBody === 'moon' ? 'Moon' : 'Mars'}...`}
+            placeholder="Search places on Moon..."
             className="search-input"
           />
           <button
@@ -1041,6 +1065,28 @@ const MapViewer: React.FC<MapViewerProps> = ({
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Lunar Tour Start Button */}
+      {currentPage === 'main' && showLunarTour && (
+        <div className="lunar-tour-start">
+          <button 
+            className="tour-start-button"
+            onClick={() => {
+              // Aqui implementaremos a lógica para iniciar o tour
+              console.log('Iniciando tour lunar das missões Apollo');
+            }}
+          >
+            <div className="tour-start-content">
+              <span className="tour-start-text">Inicio</span>
+              <div className="tour-start-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+            </div>
+          </button>
         </div>
       )}
 
