@@ -9,22 +9,412 @@ import {
   searchFeaturesByName 
 } from '../services/gazetteer.service';
 
+// Interface para características geológicas
+interface GeologicalFeature {
+  name: string;
+  icon: string;
+  type: string;
+  description: string;
+  coordinates: string;
+  detailedDescription: string;
+  data: Array<{ label: string; value: string }>;
+}
+
 interface MapViewerProps {
   currentBody: CelestialBody;
   is3DMode: boolean;
+  currentPage: 'main' | 'feature-detail';
+  selectedFeature: GeologicalFeature | null;
 }
 
-const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
+const MapViewer: React.FC<MapViewerProps> = ({ 
+  currentBody, 
+  is3DMode, 
+  currentPage, 
+  selectedFeature
+}) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
   const [gazetteerData, setGazetteerData] = useState<GazetteerFeature[]>([]);
-  const [selectedFeature, setSelectedFeature] = useState<GazetteerFeature | null>(null);
+  const [selectedGazetteerFeature, setSelectedGazetteerFeature] = useState<GazetteerFeature | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<GazetteerFeature[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [showAllPoints, setShowAllPoints] = useState(true);
   const [visiblePoints, setVisiblePoints] = useState<GazetteerFeature[]>([]);
   const [hoveredFeature, setHoveredFeature] = useState<GazetteerFeature | null>(null);
+  const [showDataSubmenu, setShowDataSubmenu] = useState(false);
+  const [dataSearchTerm, setDataSearchTerm] = useState('');
+  const [selectedDataCategory, setSelectedDataCategory] = useState<string>('');
+  const [categoryResults, setCategoryResults] = useState<GazetteerFeature[]>([]);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [currentCameraPosition, setCurrentCameraPosition] = useState<{lat: number, lon: number} | null>(null);
+  const [cameraHeight, setCameraHeight] = useState<number>(0);
+
+  // Função para aplicar filtros inteligentes
+  const applySmartFilters = (filters: string[]) => {
+    if (filters.length === 0) {
+      setCategoryResults([]);
+      return;
+    }
+
+    console.log('Aplicando filtros:', filters);
+    console.log('Total de features no gazetteer:', gazetteerData.length);
+
+    const filteredFeatures = gazetteerData.filter(feature => {
+      const featureName = feature.properties.name?.toLowerCase() || '';
+      const featureType = feature.properties.feature_type?.toLowerCase() || '';
+      
+      // Se múltiplos filtros estão selecionados, usar OR logic
+      return filters.some(filterKey => {
+        switch (filterKey) {
+          case 'craters':
+            // Lógica mais robusta para crateras
+            const isCrater = featureName.includes('crater') || featureType.includes('crater') || 
+                            featureName.includes('impact') || featureType.includes('impact');
+            
+            // Para Lua: Descartes e Fra Mauro são crateras conhecidas
+            const isLunarCrater = currentBody === 'moon' && 
+                                 (featureName.includes('descartes') || featureName.includes('fra mauro'));
+            
+            // Para Marte: verificar se é uma cratera conhecida
+            const isMartianCrater = currentBody === 'mars' && (
+              featureName.includes('airy') || featureName.includes('gale') || 
+              featureName.includes('jezero') || featureName.includes('endeavour') ||
+              featureName.includes('gusev') || featureName.includes('meridiani')
+            );
+            
+            return isCrater || isLunarCrater || isMartianCrater;
+          case 'volcanoes':
+            return featureName.includes('volcano') || featureType.includes('volcano') ||
+                   featureName.includes('patera') || featureType.includes('patera');
+          case 'mountains':
+            return featureName.includes('mountain') || featureType.includes('mountain') ||
+                   featureName.includes('mons') || featureType.includes('mons') ||
+                   featureName.includes('montes') || featureType.includes('montes');
+          case 'canyons':
+            return featureName.includes('canyon') || featureType.includes('canyon') ||
+                   featureName.includes('valley') || featureType.includes('valley') ||
+                   featureName.includes('vallis') || featureType.includes('vallis') ||
+                   featureName.includes('valles') || featureType.includes('valles');
+          case 'maria':
+            return featureName.includes('mare') || featureType.includes('mare') ||
+                   featureName.includes('sea') || featureType.includes('sea');
+          case 'rilles':
+            return featureName.includes('rille') || featureType.includes('rille') ||
+                   featureName.includes('rima') || featureType.includes('rima');
+          case 'polar':
+            return featureName.includes('polar') || featureType.includes('polar') ||
+                   featureName.includes('planum') || featureType.includes('planum') ||
+                   featureName.includes('boreum') || featureType.includes('boreum');
+          default:
+            return false;
+        }
+      });
+    });
+    
+    console.log('Features filtradas:', filteredFeatures.length);
+    if (filteredFeatures.length > 0) {
+      console.log('Primeiras features encontradas:', filteredFeatures.slice(0, 3).map(f => f.properties.name));
+    } else {
+      console.log('Nenhuma feature encontrada. Verificando dados disponíveis...');
+      console.log('Primeiras 5 features do gazetteer:', gazetteerData.slice(0, 5).map(f => f.properties.name));
+    }
+    
+    setCategoryResults(filteredFeatures);
+  };
+
+
+  // Função para lidar com clique em uma feature específica
+  const handleFeatureClick = (feature: GazetteerFeature) => {
+    // Fechar o submenu
+    setShowDataSubmenu(false);
+    setSelectedDataCategory('');
+    setDataSearchTerm('');
+    
+    // Navegar para a feature selecionada
+    flyToLocation(feature);
+    
+    // Atualizar estados do Search Locations
+    setSearchResults([feature]);
+    setVisiblePoints([feature]);
+    setShowAllPoints(false);
+    setSearchTerm(feature.properties.name || '');
+  };
+
+
+  // Função para obter informações detalhadas de uma feature
+  const getFeatureDetails = (featureName: string, body: CelestialBody): any => {
+    const featureDetails: { [key: string]: any } = {
+      'earth': {
+        'Mount Everest': {
+          description: 'Highest peak on Earth',
+          detailedDescription: 'Highest peak on Earth, located in the Himalayas. Its formation is the result of the collision between the Indian and Eurasian tectonic plates millions of years ago.',
+          data: [
+            { label: 'Altitude', value: '8,848 m' },
+            { label: 'Age', value: '60 million years' },
+            { label: 'First Ascent', value: 'May 29, 1953' }
+          ]
+        },
+        'Mount Kilimanjaro': {
+          description: 'Highest volcano in Africa',
+          detailedDescription: 'Dormant volcano in Tanzania, formed by three volcanic cones. Its glacier is disappearing due to climate change.',
+          data: [
+            { label: 'Altitude', value: '5,895 m' },
+            { label: 'Last Eruption', value: '150,000 years ago' },
+            { label: 'Type', value: 'Stratovolcano' }
+          ]
+        },
+        'Grand Canyon': {
+          description: 'Famous steep-sided canyon',
+          detailedDescription: 'Canyon carved by the Colorado River over millions of years, revealing ancient geological layers.',
+          data: [
+            { label: 'Depth', value: '1,857 m' },
+            { label: 'Length', value: '446 km' },
+            { label: 'Age', value: '6 million years' }
+          ]
+        }
+      },
+      'moon': {
+        'Tycho Crater': {
+          description: 'Prominent lunar impact crater',
+          detailedDescription: 'Impact crater formed millions of years ago. Its circular structure and elevated edges are typical characteristics of the oldest lunar craters.',
+          data: [
+            { label: 'Diameter', value: '93 km' },
+            { label: 'Depth', value: '3.6 km' },
+            { label: 'Age', value: '3.85 billion years' }
+          ]
+        },
+        'Copernicus Crater': {
+          description: 'Large lunar impact crater',
+          detailedDescription: 'One of the youngest and best-preserved craters on the Moon, with a bright ray system extending hundreds of kilometers.',
+          data: [
+            { label: 'Diameter', value: '96 km' },
+            { label: 'Depth', value: '3.8 km' },
+            { label: 'Age', value: '800 million years' }
+          ]
+        },
+        'Mare Tranquillitatis': {
+          description: 'Sea of Tranquility',
+          detailedDescription: 'Lunar sea where Apollo 11 landed in 1969. Formed by basaltic lava that filled a giant impact basin.',
+          data: [
+            { label: 'Diameter', value: '873 km' },
+            { label: 'Depth', value: '1.8 km' },
+            { label: 'Age', value: '3.8 billion years' }
+          ]
+        }
+      },
+      'mars': {
+        'Olympus Mons': {
+          description: 'Largest volcano in the solar system',
+          detailedDescription: 'The largest known volcano in the solar system, three times taller than Mount Everest. Its base extends hundreds of kilometers.',
+          data: [
+            { label: 'Altitude', value: '21.9 km' },
+            { label: 'Base Diameter', value: '624 km' },
+            { label: 'Last Activity', value: '25 million years' }
+          ]
+        },
+        'Gale Crater': {
+          description: 'Impact crater explored by Curiosity',
+          detailedDescription: 'Impact crater explored by the Curiosity rover since 2012. Contains evidence of an ancient aquatic environment.',
+          data: [
+            { label: 'Diameter', value: '154 km' },
+            { label: 'Depth', value: '3.7 km' },
+            { label: 'Age', value: '3.8 billion years' }
+          ]
+        },
+        'Valles Marineris': {
+          description: 'Largest canyon system on Mars',
+          detailedDescription: 'Giant canyon system extending thousands of kilometers, much larger than Earth\'s Grand Canyon.',
+          data: [
+            { label: 'Length', value: '4,000 km' },
+            { label: 'Depth', value: '7 km' },
+            { label: 'Width', value: '200 km' }
+          ]
+        }
+      }
+    };
+
+    return featureDetails[body]?.[featureName] || null;
+  };
+
+  // Função para filtrar opções de dados baseada na busca
+  const getFilteredDataOptions = () => {
+    const options = [];
+    
+    if (currentBody === 'earth') {
+      // Terra - opções temporariamente ocultas
+      return [];
+    }
+    
+    if (currentBody === 'moon') {
+      options.push(
+        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌑' },
+        { key: 'maria', label: 'Lunar Maria', description: 'Planícies de lava basáltica', icon: '🌊' },
+        { key: 'rilles', label: 'Rilles & Valleys', description: 'Rilles e vales lunares', icon: '🌊' }
+      );
+    }
+    
+    if (currentBody === 'mars') {
+      options.push(
+        { key: 'volcanoes', label: 'Volcanoes', description: 'Vulcões marcianos', icon: '🌋' },
+        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌑' },
+        { key: 'canyons', label: 'Canyons', description: 'Sistema Valles Marineris', icon: '🏔️' },
+        { key: 'mountains', label: 'Mountains', description: 'Montanhas marcianas', icon: '⛰️' },
+        { key: 'polar', label: 'Polar Caps', description: 'Calotas polares', icon: '🧊' }
+      );
+    }
+    
+    // Filtrar baseado no termo de busca
+    if (!dataSearchTerm.trim()) {
+      return options;
+    }
+    
+    const searchLower = dataSearchTerm.toLowerCase();
+    return options.filter(option => 
+      option.label.toLowerCase().includes(searchLower) ||
+      option.description.toLowerCase().includes(searchLower) ||
+      option.key.toLowerCase().includes(searchLower)
+    );
+  };
+
+  // Geological features data by celestial body - Temporarily disabled
+  /*
+  const getGeologicalFeatures = (body: CelestialBody) => {
+    switch (body) {
+      case 'earth':
+        return [
+          { 
+            name: 'Mount Everest', 
+            icon: '🏔️', 
+            type: 'mountain', 
+            description: 'Highest peak on Earth', 
+            coordinates: '27.9881°N, 86.9250°E',
+            detailedDescription: 'Pico mais alto da Terra, localizado na cordilheira do Himalaia. Sua formação é resultado da colisão entre as placas tectônicas indiana e eurasiana há milhões de anos.',
+            data: [
+              { label: 'Altitude', value: '8.848 m' },
+              { label: 'Idade', value: '60 milhões de anos' },
+              { label: 'Primeira Ascensão', value: '29 de maio de 1953' }
+            ]
+          },
+          { 
+            name: 'Mount Kilimanjaro', 
+            icon: '🌋', 
+            type: 'volcano', 
+            description: 'Highest volcano in Africa', 
+            coordinates: '3.0674°S, 37.3556°E',
+            detailedDescription: 'Vulcão adormecido na Tanzânia, formado por três cones vulcânicos. Sua geleira está desaparecendo devido às mudanças climáticas.',
+            data: [
+              { label: 'Altitude', value: '5.895 m' },
+              { label: 'Última Erupção', value: '150.000 anos atrás' },
+              { label: 'Tipo', value: 'Estratovulcão' }
+            ]
+          },
+          { 
+            name: 'Grand Canyon', 
+            icon: '🏔️', 
+            type: 'valley', 
+            description: 'Famous steep-sided canyon', 
+            coordinates: '36.1069°N, 112.1129°W',
+            detailedDescription: 'Cânion esculpido pelo rio Colorado ao longo de milhões de anos, revelando camadas geológicas antigas.',
+            data: [
+              { label: 'Profundidade', value: '1.857 m' },
+              { label: 'Comprimento', value: '446 km' },
+              { label: 'Idade', value: '6 milhões de anos' }
+            ]
+          }
+        ];
+      case 'moon':
+        return [
+          { 
+            name: 'Tycho Crater', 
+            icon: '🌑', 
+            type: 'crater', 
+            description: 'Prominent lunar impact crater', 
+            coordinates: '43.3°S, 11.2°W',
+            detailedDescription: 'Cratera de impacto formada há milhões de anos. Sua estrutura circular e bordes elevados são características típicas dos crateres lunares mais antigos.',
+            data: [
+              { label: 'Diâmetro', value: '93 km' },
+              { label: 'Profundidade', value: '3.6 km' },
+              { label: 'Idade', value: '3.85 bilhões de anos' }
+            ]
+          },
+          { 
+            name: 'Copernicus Crater', 
+            icon: '🌑', 
+            type: 'crater', 
+            description: 'Large lunar impact crater', 
+            coordinates: '9.6°N, 20.1°W',
+            detailedDescription: 'Uma das crateras mais jovens e bem preservadas da Lua, com sistema de raios brilhantes que se estendem por centenas de quilômetros.',
+            data: [
+              { label: 'Diâmetro', value: '96 km' },
+              { label: 'Profundidade', value: '3.8 km' },
+              { label: 'Idade', value: '800 milhões de anos' }
+            ]
+          },
+          { 
+            name: 'Mare Tranquillitatis', 
+            icon: '🌑', 
+            type: 'mare', 
+            description: 'Sea of Tranquility', 
+            coordinates: '8.5°N, 31.4°E',
+            detailedDescription: 'Mar lunar onde a Apollo 11 pousou em 1969. Formado por lava basáltica que preencheu uma bacia de impacto gigante.',
+            data: [
+              { label: 'Diâmetro', value: '873 km' },
+              { label: 'Profundidade', value: '1.8 km' },
+              { label: 'Idade', value: '3.8 bilhões de anos' }
+            ]
+          }
+        ];
+      case 'mars':
+        return [
+          { 
+            name: 'Olympus Mons', 
+            icon: '🌋', 
+            type: 'volcano', 
+            description: 'Largest volcano in the solar system', 
+            coordinates: '18.4°N, 226.0°E',
+            detailedDescription: 'O maior vulcão conhecido no sistema solar, três vezes mais alto que o Monte Everest. Sua base se estende por centenas de quilômetros.',
+            data: [
+              { label: 'Altitude', value: '21.9 km' },
+              { label: 'Diâmetro da Base', value: '624 km' },
+              { label: 'Última Atividade', value: '25 milhões de anos' }
+            ]
+          },
+          { 
+            name: 'Gale Crater', 
+            icon: '🌑', 
+            type: 'crater', 
+            description: 'Impact crater explored by Curiosity', 
+            coordinates: '5.4°S, 137.8°E',
+            detailedDescription: 'Cratera de impacto explorada pelo rover Curiosity desde 2012. Contém evidências de um antigo ambiente aquático.',
+            data: [
+              { label: 'Diâmetro', value: '154 km' },
+              { label: 'Profundidade', value: '3.7 km' },
+              { label: 'Idade', value: '3.8 bilhões de anos' }
+            ]
+          },
+          { 
+            name: 'Valles Marineris', 
+            icon: '🏔️', 
+            type: 'valley', 
+            description: 'Largest canyon system on Mars', 
+            coordinates: '13.9°S, 59.2°W',
+            detailedDescription: 'Sistema de cânions gigantesco que se estende por milhares de quilômetros, muito maior que o Grand Canyon da Terra.',
+            data: [
+              { label: 'Comprimento', value: '4.000 km' },
+              { label: 'Profundidade', value: '7 km' },
+              { label: 'Largura', value: '200 km' }
+            ]
+          }
+        ];
+      default:
+        return [];
+    }
+  };
+  */
+
+  // Funções removidas temporariamente - características geológicas em desenvolvimento
 
   const getFeatureLongitude = (feature: GazetteerFeature): number | undefined => {
     const lonFromGeometry = feature.geometry?.coordinates?.[0];
@@ -91,7 +481,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
       // Para la Luna hay ~9000 puntos, mostramos solo una muestra
       const maxPoints = currentBody === 'earth' ? 500 : 1000;
       setVisiblePoints(validFeatures.slice(0, maxPoints));
-      setSelectedFeature(null);
+      setSelectedGazetteerFeature(null);
       setSearchTerm('');
       setSearchResults([]);
     });
@@ -144,6 +534,43 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
     }
   }, [searchTerm, gazetteerData]);
 
+  // Rastrear posição da câmera para o mini-mapa
+  useEffect(() => {
+    if (!viewerRef.current) return;
+
+    const viewer = viewerRef.current;
+    
+    const updateCameraPosition = () => {
+      try {
+        const camera = viewer.camera;
+        const position = camera.positionCartographic;
+        
+        if (position && position.latitude && position.longitude) {
+          const lat = Cesium.Math.toDegrees(position.latitude);
+          const lon = Cesium.Math.toDegrees(position.longitude);
+          const height = camera.positionCartographic.height;
+          
+          setCurrentCameraPosition({ lat, lon });
+          setCameraHeight(height);
+          console.log('Camera position updated:', { lat, lon, height });
+          console.log('Mini-map should show:', (height > 0 && height < 10000000) ? 'YES' : 'NO');
+        }
+      } catch (error) {
+        console.log('Error updating camera position:', error);
+      }
+    };
+
+    // Atualizar posição quando a câmera se move
+    viewer.camera.moveEnd.addEventListener(updateCameraPosition);
+    
+    // Atualizar posição inicial após um pequeno delay
+    setTimeout(updateCameraPosition, 1000);
+
+    return () => {
+      viewer.camera.moveEnd.removeEventListener(updateCameraPosition);
+    };
+  }, [currentBody, viewerRef.current]);
+
   // Función para volar a un punto específico
   const flyToLocation = (feature: GazetteerFeature) => {
     if (!viewerRef.current) return;
@@ -156,7 +583,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
 
     // Cerrar búsqueda
     setShowSearch(false);
-    setSelectedFeature(feature);
+    setSelectedGazetteerFeature(feature);
 
     // Volar al punto
     viewer.camera.flyTo({
@@ -170,12 +597,291 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
     });
   };
 
-  const selectedPosition = selectedFeature ? getFeaturePosition(selectedFeature) : null;
+  const selectedPosition = selectedGazetteerFeature ? getFeaturePosition(selectedGazetteerFeature) : null;
   const hoveredPosition = hoveredFeature ? getFeaturePosition(hoveredFeature) : null;
 
   return (
     <div className="map-viewer-container">
-      {/* Search Panel */}
+      {/* System Menu - Only show on main page */}
+      {currentPage === 'main' && (
+      <div className="system-menu">
+        <div className="menu-header">
+          <h2 className="menu-title">{currentBody.charAt(0).toUpperCase() + currentBody.slice(1)} Menu</h2>
+          <div className="menu-section">General</div>
+        </div>
+        <div className="menu-items">
+          <button className="menu-item">
+            <span className="menu-icon">🗺️</span>
+            <span className="menu-text">{currentBody === 'earth' ? 'Earth' : currentBody === 'moon' ? 'Moon' : 'Mars'} Tour</span>
+          </button>
+          <div className="menu-item-container">
+            <button 
+              className="menu-item"
+              onClick={() => {
+                setShowDataSubmenu(!showDataSubmenu);
+                if (!showDataSubmenu) {
+                  setDataSearchTerm(''); // Clear search when opening
+                  setSelectedDataCategory(''); // Clear selected category
+                  setCategoryResults([]); // Clear category results
+                  setSelectedFilters([]); // Clear selected filters
+                }
+              }}
+            >
+              <span className="menu-icon">📊</span>
+              <span className="menu-text">{currentBody === 'earth' ? 'Earth' : currentBody === 'moon' ? 'Moon' : 'Mars'} Data</span>
+              <span className={`menu-arrow ${showDataSubmenu ? 'rotated' : ''}`}>›</span>
+            </button>
+            
+            {/* Submenu de características geológicas */}
+            {showDataSubmenu && (
+              <div className="submenu">
+                {/* Campo de busca - Temporariamente oculto */}
+                {/* <div className="submenu-search">
+                  <input
+                    type="text"
+                    value={dataSearchTerm}
+                    onChange={(e) => {
+                      setDataSearchTerm(e.target.value);
+                      // Se o usuário digitar algo, também filtrar dados do gazetteer
+                      if (e.target.value.trim()) {
+                        handleDirectSearch(e.target.value);
+                      } else {
+                        // Se campo estiver vazio, limpar resultados
+                        setSearchResults([]);
+                        setVisiblePoints(gazetteerData.slice(0, currentBody === 'earth' ? 500 : 1000));
+                        setShowAllPoints(true);
+                        setSearchTerm('');
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      // Se pressionar Enter, executar busca direta
+                      if (e.key === 'Enter' && dataSearchTerm.trim()) {
+                        handleDirectSearch(dataSearchTerm);
+                        setShowDataSubmenu(false);
+                      }
+                    }}
+                    placeholder={`Buscar características de ${currentBody === 'earth' ? 'Terra' : currentBody === 'moon' ? 'Lua' : 'Marte'}...`}
+                    className="submenu-search-input"
+                  />
+                </div> */}
+
+                {/* Opções de dados personalizadas por corpo celeste */}
+                <div className="submenu-content">
+                  {!selectedDataCategory ? (
+                    // Mostrar filtros inteligentes como chips
+                    <>
+                      <div className="filters-section">
+                        <div className="filters-title">Select Features</div>
+                        <div className="filters-chips">
+                          {getFilteredDataOptions().map((option, index) => (
+                      <button
+                              key={index} 
+                              className={`filter-chip ${selectedFilters.includes(option.key) ? 'active' : ''}`}
+                              onClick={() => {
+                                const newFilters = selectedFilters.includes(option.key)
+                                  ? selectedFilters.filter(f => f !== option.key)
+                                  : [...selectedFilters, option.key];
+                                setSelectedFilters(newFilters);
+                                applySmartFilters(newFilters);
+                              }}
+                            >
+                              <span className="filter-chip-icon">{option.icon}</span>
+                              <span className="filter-chip-text">{option.label}</span>
+                        </button>
+                      ))}
+                </div>
+
+                        {selectedFilters.length > 0 && (
+                          <div className="filters-actions">
+                      <button
+                              className="filter-action-btn"
+                              onClick={() => {
+                                setSelectedFilters([]);
+                                setCategoryResults([]);
+                              }}
+                            >
+                              Clear Filters
+                      </button>
+                            <span className="filter-count">
+                              {categoryResults.length} result{categoryResults.length !== 1 ? 's' : ''}
+                            </span>
+                  </div>
+                        )}
+                </div>
+
+                      {/* Lista de resultados quando filtros estão ativos */}
+                      {selectedFilters.length > 0 && (
+                        <div className="filtered-results">
+                          <div className="results-title">Results Found</div>
+                          {categoryResults.slice(0, 10).map((feature, index) => (
+                        <button
+                        key={index} 
+                              className="submenu-item submenu-feature-item"
+                              onClick={() => handleFeatureClick(feature)}
+                      >
+                              <span className="submenu-icon">📍</span>
+                        <div className="submenu-item-content">
+                                <span className="submenu-text">{feature.properties.name}</span>
+                                <span className="submenu-description">
+                                  {feature.properties.feature_type || 'Geological feature'}
+                                </span>
+                              </div>
+                        </button>
+                      ))}
+                          
+                          {categoryResults.length > 10 && (
+                            <div className="results-more">
+                              +{categoryResults.length - 10} more results
+                    </div>
+                          )}
+                  </div>
+                      )}
+                      
+                      {/* Feedback da busca direta - Temporariamente oculto */}
+                      
+                      
+                      {getFilteredDataOptions().length === 0 && !dataSearchTerm.trim() && currentBody === 'earth' && (
+                        <div className="submenu-no-results">
+                          <span>Earth options temporarily unavailable</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    // Mostrar lista de features quando uma categoria está selecionada
+                    <>
+                      <div className="submenu-header">
+                        <button 
+                          className="submenu-back-button"
+                          onClick={() => {
+                            setSelectedDataCategory('');
+                            setCategoryResults([]);
+                          }}
+                        >
+                          ← Back
+                        </button>
+                        <span className="submenu-category-title">
+                          {getFilteredDataOptions().find(opt => opt.key === selectedDataCategory)?.label}
+                        </span>
+                </div>
+
+                      {categoryResults.map((feature, index) => (
+                      <button 
+                        key={index} 
+                          className="submenu-item submenu-feature-item"
+                          onClick={() => handleFeatureClick(feature)}
+                      >
+                          <span className="submenu-icon">📍</span>
+                        <div className="submenu-item-content">
+                            <span className="submenu-text">{feature.properties.name}</span>
+                            <span className="submenu-description">
+                              {feature.properties.feature_type || 'Geological feature'}
+                            </span>
+                        </div>
+                      </button>
+                      ))}
+                      
+                      {categoryResults.length === 0 && (
+                        <div className="submenu-no-results">
+                          <span>No features found in this category</span>
+                    </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* Feature Information Panel - Only show on main page */}
+      {currentPage === 'main' && selectedGazetteerFeature && (
+        <div className="feature-info-panel">
+          <div className="feature-info-header">
+            <h3 className="feature-info-title">
+              <span className="feature-info-icon">📍</span>
+              {selectedGazetteerFeature.properties.name}
+            </h3>
+            <button 
+              className="feature-info-close"
+              onClick={() => setSelectedGazetteerFeature(null)}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="feature-info-content">
+            {(() => {
+              const featureName = selectedGazetteerFeature.properties.name;
+              const featureDetails = getFeatureDetails(featureName, currentBody);
+              
+              if (featureDetails) {
+                return (
+                  <>
+            <div className="feature-description">
+                      <p><strong>{featureDetails.description}</strong></p>
+                      <p>{featureDetails.detailedDescription}</p>
+            </div>
+            
+            <div className="feature-data">
+                      {featureDetails.data.map((item: any, index: number) => (
+                <div key={index} className="data-item">
+                  <span className="data-label">{item.label}:</span>
+                  <span className="data-value">{item.value}</span>
+                </div>
+              ))}
+                      
+                      <div className="data-item">
+                        <span className="data-label">Latitude:</span>
+                        <span className="data-value">{selectedPosition ? `${selectedPosition.lat.toFixed(4)}°` : 'N/A'}</span>
+                      </div>
+                      <div className="data-item">
+                        <span className="data-label">Longitude:</span>
+                        <span className="data-value">{selectedPosition ? `${selectedPosition.lon180.toFixed(4)}°` : 'N/A'}</span>
+                      </div>
+                      {selectedGazetteerFeature.properties.feature_type && (
+                        <div className="data-item">
+                          <span className="data-label">Type:</span>
+                          <span className="data-value">{selectedGazetteerFeature.properties.feature_type}</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                );
+              } else {
+                return (
+                  <>
+                    <div className="feature-description">
+                      <p>Gazetteer location on {currentBody}</p>
+            </div>
+            
+                    <div className="feature-data">
+                      <div className="data-item">
+                        <span className="data-label">Latitude:</span>
+                        <span className="data-value">{selectedPosition ? `${selectedPosition.lat.toFixed(4)}°` : 'N/A'}</span>
+            </div>
+                      <div className="data-item">
+                        <span className="data-label">Longitude:</span>
+                        <span className="data-value">{selectedPosition ? `${selectedPosition.lon180.toFixed(4)}°` : 'N/A'}</span>
+                      </div>
+                      {selectedGazetteerFeature.properties.feature_type && (
+                        <div className="data-item">
+                          <span className="data-label">Type:</span>
+                          <span className="data-value">{selectedGazetteerFeature.properties.feature_type}</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                );
+              }
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* Search Panel - Only show on main page */}
+      {currentPage === 'main' && (
       <div className="search-panel">
         <div className="search-header">
           <h3>Search Locations</h3>
@@ -195,7 +901,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
           <button
             onClick={() => {
               setSearchTerm('');
-              setSelectedFeature(null);
+              setSelectedGazetteerFeature(null);
             }}
             className="search-clear-btn"
             title="Clear search"
@@ -232,12 +938,12 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
         )}
 
         {/* Selected Feature Info */}
-        {selectedFeature && (
+        {selectedGazetteerFeature && (
           <div className="feature-info">
             <div className="feature-header">
-              <h4>{selectedFeature.properties.name}</h4>
+              <h4>{selectedGazetteerFeature.properties.name}</h4>
               <button 
-                onClick={() => setSelectedFeature(null)}
+                onClick={() => setSelectedGazetteerFeature(null)}
                 className="feature-close-btn"
                 title="Close"
               >
@@ -257,10 +963,10 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
                   {selectedPosition ? `${selectedPosition.lon180.toFixed(4)}°` : 'N/A'}
                 </span>
               </div>
-              {selectedFeature.properties.feature_type && (
+              {selectedGazetteerFeature.properties.feature_type && (
                 <div className="detail-item">
                   <span className="detail-label">Type</span>
-                  <span className="detail-value">{selectedFeature.properties.feature_type}</span>
+                  <span className="detail-value">{selectedGazetteerFeature.properties.feature_type}</span>
                 </div>
               )}
             </div>
@@ -280,7 +986,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
               Show locations ({visiblePoints.length.toLocaleString()} of {gazetteerData.length.toLocaleString()})
             </span>
           </label>
-          {hoveredFeature && !selectedFeature && (
+          {hoveredFeature && !selectedGazetteerFeature && (
             <div className="hover-info">
               <span className="hover-label">Hovering:</span>
               <span className="hover-name">{hoveredFeature.properties.name}</span>
@@ -288,6 +994,55 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
           )}
         </div>
       </div>
+      )}
+
+      {/* Feature Detail Panel - Only show on feature-detail page */}
+      {currentPage === 'feature-detail' && selectedFeature && (
+        <div className="feature-detail-panel">
+          <div className="feature-detail-header">
+            <h2 className="feature-detail-title">Descripción</h2>
+          </div>
+          
+          <div className="feature-detail-content">
+            <div className="feature-detail-description">
+              <p>{selectedFeature.detailedDescription}</p>
+            </div>
+            
+            <div className="feature-detail-separator"></div>
+            
+            <div className="feature-detail-data">
+              {selectedFeature.data.map((item, index) => (
+                <div key={index} className="feature-detail-data-item">
+                  <span className="feature-detail-label">{item.label}:</span>
+                  <span className="feature-detail-value">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Mini-map de localização - só aparece com zoom alto */}
+      {currentPage === 'main' && cameraHeight > 0 && cameraHeight < 10000000 && (
+        <div className="mini-map">
+          <div className="mini-map-content">
+            <div className="mini-map-circle">
+              {currentCameraPosition ? (
+                <div 
+                  className="mini-map-dot"
+                  style={{
+                    left: `${50 + (currentCameraPosition.lon / 180) * 45}%`,
+                    top: `${50 - (currentCameraPosition.lat / 90) * 45}%`
+                  }}
+                ></div>
+              ) : (
+                <div className="mini-map-dot" style={{ left: '50%', top: '50%' }}></div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cesium Viewer */}
       <div className="cesium-container">
@@ -316,7 +1071,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
             return null;
           }
 
-          const isSelected = selectedFeature?.properties.name === feature.properties.name;
+          const isSelected = selectedGazetteerFeature?.properties.name === feature.properties.name;
           const isHovered = hoveredFeature?.properties.name === feature.properties.name;
           return (
             <Entity
@@ -332,7 +1087,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
               onMouseEnter={() => setHoveredFeature(feature)}
               onMouseLeave={() => setHoveredFeature(null)}
               onClick={() => {
-                setSelectedFeature(feature);
+                setSelectedGazetteerFeature(feature);
                 flyToLocation(feature);
               }}
             />
@@ -341,7 +1096,7 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
 
         {/* Etiqueta para el punto seleccionado o hover */}
         {(selectedPosition || hoveredPosition) && (() => {
-          const labelFeature = selectedFeature ?? hoveredFeature;
+          const labelFeature = selectedGazetteerFeature ?? hoveredFeature;
           const labelPosition = selectedPosition ?? hoveredPosition;
 
           if (!labelFeature || !labelPosition) {
@@ -353,13 +1108,13 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
               position={Cesium.Cartesian3.fromDegrees(labelPosition.lon180, labelPosition.lat)}
               label={{
                 text: labelFeature.properties.name,
-                font: selectedFeature ? '14pt sans-serif' : '12pt sans-serif',
+                font: selectedGazetteerFeature ? '14pt sans-serif' : '12pt sans-serif',
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
                 outlineWidth: 2,
                 verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                 pixelOffset: new Cesium.Cartesian2(0, -20),
-                fillColor: selectedFeature ? Cesium.Color.WHITE : Cesium.Color.YELLOW,
-                outlineColor: selectedFeature ? Cesium.Color.BLACK : Cesium.Color.RED.withAlpha(0.8),
+                fillColor: selectedGazetteerFeature ? Cesium.Color.WHITE : Cesium.Color.YELLOW,
+                outlineColor: selectedGazetteerFeature ? Cesium.Color.BLACK : Cesium.Color.RED.withAlpha(0.8),
                 heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                 disableDepthTestDistance: Number.POSITIVE_INFINITY
               }}
