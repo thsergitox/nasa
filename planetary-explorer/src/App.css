@@ -58,10 +58,10 @@ body {
 .app {
   display: grid;
   grid-template-rows: 60px 1fr;
-  grid-template-columns: 300px 1fr;
-  grid-template-areas: 
-    "header header"
-    "solar map";
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "map";
   height: 100vh;
   width: 100vw;
   background: var(--space-bg);
@@ -206,22 +206,28 @@ body {
   position: relative;
   min-height: 0;
   min-width: 0;
+  height: 100%;
+  width: 100%;
 }
 
 /* Solar Panel */
 .solar-panel {
-  grid-area: solar;
   background: var(--space-glass);
   backdrop-filter: blur(20px);
-  border-right: 1px solid var(--space-border);
+  border: 1px solid var(--space-border);
+  border-radius: var(--border-radius-lg);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  z-index: 100;
-  position: relative;
-  height: 100%;
+  z-index: 200;
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: min(360px, calc(100% - 48px));
+  max-height: calc(100% - 48px);
   overflow-y: auto;
+  box-shadow: var(--shadow-lg);
 }
 
 .panel-header {
@@ -396,8 +402,10 @@ body {
 /* Map Container */
 .map-container {
   position: relative;
+  display: flex;
   width: 100%;
   height: 100%;
+  flex: 1;
 }
 
 /* Map Viewer Styles */
@@ -418,9 +426,9 @@ body {
 
 .search-panel {
   position: absolute;
-  top: 240px;
-  right: 20px;
-  width: 320px;
+  top: 24px;
+  right: 24px;
+  width: clamp(260px, 24vw, 340px);
   background: var(--space-glass);
   backdrop-filter: blur(20px);
   border: 1px solid var(--space-border);
@@ -428,6 +436,8 @@ body {
   padding: 20px;
   z-index: 1000;
   box-shadow: var(--shadow-lg);
+  max-height: calc(100% - 48px);
+  overflow-y: auto;
 }
 
 .search-header {
@@ -907,30 +917,85 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .app {
-    grid-template-columns: 250px 1fr;
-  }
-  
   .solar-panel {
+    width: min(320px, calc(100% - 48px));
     padding: 16px;
   }
-  
-  .chat-panel {
-    width: 250px;
+
+  .search-panel {
+    width: clamp(240px, 30vw, 320px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .solar-panel {
+    position: static;
+    width: 100%;
+    max-height: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  .map-container {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+  }
+
+  .map-viewer-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .cesium-container {
+    position: relative;
+    width: 100%;
+    height: min(60vh, 520px);
+    flex: 1;
+  }
+
+  .search-panel {
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin-top: 16px;
   }
 }
 
 @media (max-width: 768px) {
   .app {
-    grid-template-areas: 
+    grid-template-areas:
       "header header"
       "map map";
     grid-template-columns: 1fr;
     grid-template-rows: 60px 1fr;
   }
-  
+
   .solar-panel {
     display: none;
+  }
+
+  .main-content {
+    padding: 12px;
+  }
+
+  .map-viewer-container {
+    gap: 12px;
+  }
+
+  .cesium-container {
+    height: 55vh;
+  }
+
+  .search-panel {
+    margin-top: 0;
   }
 }
 
