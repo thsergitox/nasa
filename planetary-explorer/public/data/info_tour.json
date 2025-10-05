@@ -1,0 +1,75 @@
+[
+    {
+        "title": "Apollo 11",
+        "historical_significance": "This is the site where Apollo 11 landed in 1969 — the first manned landing in history. Here, Neil Armstrong took his famous step: 'One small step for man, one giant leap for mankind.'",
+        "scientific_value": "This mission provided the first lunar soil samples and confirmed the basaltic composition of the lunar maria. It also validated the feasibility of manned travel to the Moon.",
+        "reference_points": [
+            {
+                "name": "Mare Tranquillitatis",
+                "description": "A lunar sea formed by ancient solidified lava flows. It was chosen for its flat and safe surface for landing."
+            },
+            {
+                "name": "Mount Marilyn",
+                "description": "A visual reference point used by Apollo 11 astronauts to orient themselves during descent."
+            }
+        ],
+        "reference": "NASA Apollo 11 Mission Overview – National Aeronautics and Space Administration (NASA)",
+        "link": "https://www.nasa.gov/mission/apollo-11/"
+    },
+    {
+        "title": "Apollo 14",
+        "historical_significance": "This mission successfully landed in 1971 after the failed attempt of Apollo 13. It was led by Alan Shepard, who became the first man to play golf on the Moon.",
+        "scientific_value": "Fra Mauro is a geological formation composed of material ejected by the impact that created Mare Imbrium. The collected samples helped scientists understand the origins of the lunar maria.",
+        "reference_points": [
+            {
+                "name": "Fra Mauro",
+                "description": "A mountainous and fractured area chosen for its age and its relation to the large impacts that shaped the lunar surface."
+            }
+        ],
+        "reference": "NASA Apollo 14 Mission Summary – Lunar and Planetary Institute (LPI)",
+        "link": "https://www.lpi.usra.edu/lunar/missions/apollo/apollo_14/"
+    },
+    {
+        "title": "Apollo 15",
+        "historical_significance": "The first Apollo mission with a dedicated scientific focus. In 1971, it introduced the Lunar Rover, allowing astronauts to explore much wider areas.",
+        "scientific_value": "The Hadley-Rille site combines mountains (Mons Hadley and Hadley Delta) with a sinuous channel formed by ancient lava flows. Rocks collected included anorthosite, one of the oldest lunar materials.",
+        "reference_points": [
+            {
+                "name": "Rima Hadley",
+                "description": "A sinuous channel about 80 km long formed by lava flows — a clear example of ancient volcanic activity on the Moon."
+            },
+            {
+                "name": "Mons Hadley",
+                "description": "A prominent mountain that provided access to rocks from the Moon’s primordial crust."
+            }
+        ],
+        "reference": "NASA Apollo 15 Mission Overview – National Aeronautics and Space Administration (NASA)",
+        "link": "https://www.nasa.gov/mission/apollo-15/"
+    },
+    {
+        "title": "Apollo 16",
+        "historical_significance": "In 1972, Apollo 16 became the first mission to explore the lunar highlands. It was key to understanding the Moon’s oldest regions.",
+        "scientific_value": "Descartes Highlands is a region of hills formed mainly by impact rocks, not volcanic activity. This finding changed the previous geological interpretation of the Moon.",
+        "reference_points": [
+            {
+                "name": "Descartes Highlands",
+                "description": "An elevated terrain composed of impact breccias. It provided evidence that the lunar highlands are not of volcanic origin."
+            }
+        ],
+        "reference": "NASA Apollo 16 Mission Summary – Lunar and Planetary Institute (LPI)",
+        "link": "https://www.lpi.usra.edu/lunar/missions/apollo/apollo_16/"
+    },
+    {
+        "title": "Apollo 17",
+        "historical_significance": "The last manned mission to the Moon (1972). It included geologist Harrison Schmitt, the first professional scientist to walk on the lunar surface.",
+        "scientific_value": "Taurus-Littrow Valley combines ancient highlands with younger basaltic deposits. Samples of orange soil were discovered — evidence of explosive volcanic activity.",
+        "reference_points": [
+            {
+                "name": "Taurus-Littrow Valley",
+                "description": "A mountainous valley that shows the interaction between ancient highlands and more recent basaltic plains."
+            }
+        ],
+        "reference": "NASA Apollo 17 Mission Overview – National Aeronautics and Space Administration (NASA)",
+        "link": "https://www.nasa.gov/mission/apollo-17/"
+    }
+]
