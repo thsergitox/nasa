@@ -1118,6 +1118,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 16px;
 }
 
 .data-item {
@@ -1147,12 +1148,119 @@ body {
   font-family: 'Courier New', monospace;
 }
 
+/* Official Information Section */
+.feature-official-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(74, 158, 255, 0.05);
+  border: 1px solid rgba(74, 158, 255, 0.2);
+  border-radius: 8px;
+}
+
+.official-info-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Reference Information Section */
+.feature-reference-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.reference-info-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reference-item {
+  margin-bottom: 8px;
+}
+
+.reference-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.reference-url {
+  margin-top: 8px;
+}
+
+.reference-link {
+  color: var(--space-accent);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.reference-link:hover {
+  color: var(--space-accent-hover);
+  text-decoration: underline;
+}
+
+/* Flag/Historical Information Section */
+.feature-flag-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(251, 191, 36, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 8px;
+}
+
+.flag-info-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-warning);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.flag-content p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Coordinates Section */
+.feature-coordinates {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.coordinates-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* Feature Info Panel - Left Side */
 .feature-info-panel-left {
   position: fixed;
   top: 90px;
   left: 20px;
-  width: 320px;
+  width: 380px;
+  max-height: calc(100vh - 110px);
   background: rgba(15, 15, 35, 0.95);
   border: 1px solid rgba(74, 158, 255, 0.2);
   border-radius: 16px;
@@ -1161,6 +1269,7 @@ body {
   z-index: 1000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   animation: slideInFromLeft 0.3s ease-out;
+  overflow-y: auto;
 }
 
 @keyframes slideInFromLeft {
@@ -2349,10 +2458,34 @@ body {
 /* Responsive adjustments for feature info panel */
 @media (max-width: 768px) {
   .feature-info-panel-left {
-    width: 280px;
+    width: calc(100vw - 30px);
+    max-width: 350px;
     top: 15px;
     left: 15px;
     padding: 16px;
+    max-height: calc(100vh - 30px);
+  }
+  
+  .feature-official-info,
+  .feature-reference-info,
+  .feature-flag-info,
+  .feature-coordinates {
+    padding: 10px;
+  }
+  
+  .official-info-title,
+  .reference-info-title,
+  .flag-info-title,
+  .coordinates-title {
+    font-size: 0.8rem;
+  }
+  
+  .data-label {
+    font-size: 0.7rem;
+  }
+  
+  .data-value {
+    font-size: 0.8rem;
   }
 }
 
