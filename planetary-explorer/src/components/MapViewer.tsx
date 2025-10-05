@@ -11,9 +11,10 @@ import {
 
 interface MapViewerProps {
   currentBody: CelestialBody;
+  is3DMode: boolean;
 }
 
-const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
+const MapViewer: React.FC<MapViewerProps> = ({ currentBody, is3DMode }) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
   const [gazetteerData, setGazetteerData] = useState<GazetteerFeature[]>([]);
@@ -98,6 +99,38 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
     // Actualizar provider
     setProvider(getProviderForBody(currentBody));
   }, [currentBody]);
+
+  // Cambiar modo 2D/3D cuando cambia is3DMode
+  useEffect(() => {
+    if (!viewerRef.current) return;
+
+    const viewer = viewerRef.current;
+    if (is3DMode) {
+      viewer.scene.mode = Cesium.SceneMode.SCENE3D;
+      // Configuración para modo 3D
+      viewer.scene.globe.enableLighting = true;
+      viewer.scene.globe.dynamicAtmosphereLighting = true;
+    } else {
+      viewer.scene.mode = Cesium.SceneMode.COLUMBUS_VIEW;
+      // Configuración optimizada para modo 2D
+      viewer.scene.globe.enableLighting = false;
+      viewer.scene.globe.dynamicAtmosphereLighting = false;
+      
+      // Ajustar la cámara para vista 2D óptima
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000), // Vista global
+        orientation: {
+          heading: 0.0,
+          pitch: Cesium.Math.toRadians(-90), // Vista desde arriba
+          roll: 0.0
+        }
+      });
+      
+      // Configurar límites de zoom para modo 2D
+      viewer.scene.screenSpaceCameraController.minimumZoomDistance = 1000000;
+      viewer.scene.screenSpaceCameraController.maximumZoomDistance = 50000000;
+    }
+  }, [is3DMode]);
 
   // Buscar features cuando cambia el término de búsqueda
   useEffect(() => {
@@ -263,13 +296,16 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
           full
           scene3DOnly={false}
           homeButton={false}
-          sceneModePicker={true}
+          sceneModePicker={false}
           baseLayerPicker={false}
           navigationHelpButton={false}
           animation={false}
           timeline={false}
           fullscreenButton={false}
           vrButton={false}
+          shouldAnimate={false}
+          requestRenderMode={true}
+          maximumRenderTimeChange={Infinity}
         >
         <ImageryLayer imageryProvider={provider} />
         

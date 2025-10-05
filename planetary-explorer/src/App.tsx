@@ -6,7 +6,6 @@ import './App.css';
 const App: React.FC = () => {
   const [currentBody, setCurrentBody] = useState<CelestialBody>('earth');
   const [is3DMode, setIs3DMode] = useState(true);
-  const [showTour, setShowTour] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
   const celestialBodies: { key: CelestialBody; label: string; icon: string }[] = [
@@ -20,13 +19,7 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="header">
         <div className="header-left">
-          <button
-            className={`mode-toggle ${is3DMode ? 'active' : ''}`}
-            onClick={() => setIs3DMode(!is3DMode)}
-            title="Toggle 3D Mode"
-          >
-            <span className="icon">3D</span>
-          </button>
+          {/* 3D Mode Toggle - Removed duplicate button */}
         </div>
 
         <div className="header-center">
@@ -47,14 +40,6 @@ const App: React.FC = () => {
 
         <div className="header-right">
           <button
-            className={`action-button ${showTour ? 'active' : ''}`}
-            onClick={() => setShowTour(!showTour)}
-            title="Guided Tour"
-          >
-            <span className="icon">🎯</span>
-            <span className="label">Tour</span>
-          </button>
-          <button
             className={`action-button ${showHelp ? 'active' : ''}`}
             onClick={() => setShowHelp(!showHelp)}
             title="Help & Info"
@@ -71,8 +56,18 @@ const App: React.FC = () => {
           <div className="panel-header">
             <h3>Solar System</h3>
             <div className="view-toggle">
-              <button className="toggle-btn active">3D</button>
-              <button className="toggle-btn">2D</button>
+              <button 
+                className={`toggle-btn ${is3DMode ? 'active' : ''}`}
+                onClick={() => setIs3DMode(true)}
+              >
+                3D
+              </button>
+              <button 
+                className={`toggle-btn ${is3DMode ? '' : 'active'}`}
+                onClick={() => setIs3DMode(false)}
+              >
+                2D
+              </button>
             </div>
           </div>
           <div className="solar-system-view">
@@ -110,49 +105,8 @@ const App: React.FC = () => {
 
         {/* Map Viewer */}
         <main className="map-container">
-          <MapViewer currentBody={currentBody} />
+          <MapViewer currentBody={currentBody} is3DMode={is3DMode} />
         </main>
-      </div>
-
-      {/* Bottom Controls */}
-      <div className="bottom-controls">
-        {/* Chat Panel */}
-        <aside className="chat-panel">
-          <div className="chat-header">
-            <h4>Mission Control</h4>
-            <button className="chat-toggle">💬</button>
-          </div>
-          <div className="chat-messages">
-            <div className="message system">
-              <span className="timestamp">14:32</span>
-              <span className="text">Welcome to Planetary Explorer</span>
-            </div>
-            <div className="message user">
-              <span className="timestamp">14:33</span>
-              <span className="text">Exploring {currentBody}...</span>
-            </div>
-          </div>
-          <div className="chat-input">
-            <input type="text" placeholder="Ask about planetary features..." />
-            <button>Send</button>
-          </div>
-        </aside>
-
-        {/* Floating Controls */}
-        <div className="floating-controls">
-          <button className="control-btn time-control" title="Time Controls">
-            <span className="icon">⏰</span>
-            <span className="label">Time</span>
-          </button>
-          <button className="control-btn compare-control" title="Compare Bodies">
-            <span className="icon">⚖️</span>
-            <span className="label">Compare</span>
-          </button>
-          <button className="control-btn annotate-control" title="Add Annotations">
-            <span className="icon">📝</span>
-            <span className="label">Annotate</span>
-          </button>
-        </div>
       </div>
 
       {/* Help Modal */}

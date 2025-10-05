@@ -39,24 +39,29 @@ body {
   background: var(--space-bg);
   color: var(--space-text-primary);
   overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 #root {
   width: 100vw;
   height: 100vh;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
 }
 
 
 /* App Layout */
 .app {
   display: grid;
-  grid-template-rows: 60px 1fr 120px;
+  grid-template-rows: 60px 1fr;
   grid-template-columns: 300px 1fr;
   grid-template-areas: 
     "header header"
-    "solar map"
-    "chat controls";
+    "solar map";
   height: 100vh;
   width: 100vw;
   background: var(--space-bg);
@@ -209,12 +214,14 @@ body {
   background: var(--space-glass);
   backdrop-filter: blur(20px);
   border-right: 1px solid var(--space-border);
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   z-index: 100;
   position: relative;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .panel-header {
@@ -256,11 +263,12 @@ body {
 /* Solar System View */
 .solar-system-view {
   position: relative;
-  height: 200px;
+  height: 180px;
   background: radial-gradient(circle at center, rgba(74, 158, 255, 0.1) 0%, transparent 70%);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--space-border);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .sun {
@@ -341,17 +349,24 @@ body {
 }
 
 /* Planet Info */
+.planet-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 .planet-info h4 {
   font-size: 16px;
   font-weight: 600;
   color: var(--space-text-primary);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .info-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .info-item {
@@ -403,7 +418,7 @@ body {
 
 .search-panel {
   position: absolute;
-  top: 20px;
+  top: 240px;
   right: 20px;
   width: 320px;
   background: var(--space-glass);
@@ -618,16 +633,10 @@ body {
   font-weight: 500;
 }
 
-/* Bottom Controls */
-.bottom-controls {
-  grid-area: controls;
-  display: flex;
-  align-items: flex-end;
-  padding: 0 24px 24px 0;
-  gap: 24px;
-}
+/* Bottom Controls - Removed */
 
-/* Chat Panel */
+/* Chat Panel - Hidden until functionality is implemented */
+/*
 .chat-panel {
   grid-area: chat;
   width: 300px;
@@ -741,8 +750,10 @@ body {
   background: var(--space-accent-hover);
   transform: translateY(-1px);
 }
+*/
 
-/* Floating Controls */
+/* Floating Controls - Hidden until functionality is implemented */
+/*
 .floating-controls {
   display: flex;
   gap: 12px;
@@ -782,6 +793,7 @@ body {
   font-size: 12px;
   font-weight: 500;
 }
+*/
 
 /* Modal */
 .modal-overlay {
@@ -912,36 +924,13 @@ body {
   .app {
     grid-template-areas: 
       "header header"
-      "map map"
-      "controls controls";
+      "map map";
     grid-template-columns: 1fr;
-    grid-template-rows: 60px 1fr 80px;
+    grid-template-rows: 60px 1fr;
   }
   
   .solar-panel {
     display: none;
-  }
-  
-  .chat-panel {
-    display: none;
-  }
-  
-  .floating-controls {
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .control-btn {
-    min-width: 60px;
-    padding: 8px 12px;
-  }
-  
-  .control-btn .icon {
-    font-size: 16px;
-  }
-  
-  .control-btn .label {
-    font-size: 10px;
   }
 }
 
