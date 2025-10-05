@@ -79,102 +79,123 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
   };
 
   return (
-    <div className="relative w-full h-full">
-      {/* Barra de búsqueda */}
-      <div className="absolute top-4 left-4 z-10 w-96">
-        <div className="bg-gray-900/90 backdrop-blur rounded-lg p-4 shadow-lg">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={`Buscar lugares en ${currentBody === 'earth' ? 'la Tierra' : currentBody === 'moon' ? 'la Luna' : 'Marte'}...`}
-              className="flex-1 px-3 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedFeature(null);
-              }}
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded border border-gray-700"
-            >
-              Limpiar
-            </button>
+    <div className="map-viewer-container">
+      {/* Search Panel */}
+      <div className="search-panel">
+        <div className="search-header">
+          <h3>Search Locations</h3>
+          <div className="search-stats">
+            {gazetteerData.length.toLocaleString()} locations
           </div>
+        </div>
+        
+        <div className="search-input-group">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={`Search places on ${currentBody === 'earth' ? 'Earth' : currentBody === 'moon' ? 'Moon' : 'Mars'}...`}
+            className="search-input"
+          />
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setSelectedFeature(null);
+            }}
+            className="search-clear-btn"
+            title="Clear search"
+          >
+            ✕
+          </button>
+        </div>
 
-          {/* Resultados de búsqueda */}
-          {showSearch && searchResults.length > 0 && (
-            <div className="mt-2 max-h-64 overflow-y-auto bg-gray-800 rounded border border-gray-700">
-              {searchResults.map((feature, index) => (
-                <button
-                  key={index}
-                  onClick={() => flyToLocation(feature)}
-                  className="w-full px-3 py-2 text-left hover:bg-gray-700 text-white border-b border-gray-700 last:border-b-0"
-                >
-                  <div className="font-medium">{feature.properties.name}</div>
-                  <div className="text-xs text-gray-400">
-                    Lat: {feature.properties.lat.toFixed(4)}°, 
-                    Lon: {convertLonTo180(feature.geometry.coordinates[0]).toFixed(4)}°
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Feature seleccionado */}
-          {selectedFeature && (
-            <div className="mt-4 p-3 bg-blue-900/50 rounded border border-blue-700">
-              <div className="text-white">
-                <div className="font-bold text-lg">{selectedFeature.properties.name}</div>
-                <div className="text-sm">
-                  <div>Lat: {selectedFeature.properties.lat.toFixed(4)}°</div>
-                  <div>Lon: {convertLonTo180(selectedFeature.geometry.coordinates[0]).toFixed(4)}°</div>
+        {/* Search Results */}
+        {showSearch && searchResults.length > 0 && (
+          <div className="search-results">
+            {searchResults.map((feature, index) => (
+              <button
+                key={index}
+                onClick={() => flyToLocation(feature)}
+                className="search-result-item"
+              >
+                <div className="result-name">{feature.properties.name}</div>
+                <div className="result-coords">
+                  {feature.properties.lat.toFixed(4)}°, {convertLonTo180(feature.geometry.coordinates[0]).toFixed(4)}°
                 </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Selected Feature Info */}
+        {selectedFeature && (
+          <div className="feature-info">
+            <div className="feature-header">
+              <h4>{selectedFeature.properties.name}</h4>
+              <button 
+                onClick={() => setSelectedFeature(null)}
+                className="feature-close-btn"
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="feature-details">
+              <div className="detail-item">
+                <span className="detail-label">Latitude</span>
+                <span className="detail-value">{selectedFeature.properties.lat.toFixed(4)}°</span>
               </div>
+              <div className="detail-item">
+                <span className="detail-label">Longitude</span>
+                <span className="detail-value">{convertLonTo180(selectedFeature.geometry.coordinates[0]).toFixed(4)}°</span>
+              </div>
+              {selectedFeature.properties.feature_type && (
+                <div className="detail-item">
+                  <span className="detail-label">Type</span>
+                  <span className="detail-value">{selectedFeature.properties.feature_type}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Display Controls */}
+        <div className="display-controls">
+          <label className="control-label">
+            <input
+              type="checkbox"
+              checked={showAllPoints}
+              onChange={(e) => setShowAllPoints(e.target.checked)}
+              className="control-checkbox"
+            />
+            <span className="control-text">
+              Show locations ({visiblePoints.length.toLocaleString()} of {gazetteerData.length.toLocaleString()})
+            </span>
+          </label>
+          {hoveredFeature && !selectedFeature && (
+            <div className="hover-info">
+              <span className="hover-label">Hovering:</span>
+              <span className="hover-name">{hoveredFeature.properties.name}</span>
             </div>
           )}
-
-          {/* Control de visualización de puntos */}
-          <div className="mt-4 p-3 bg-gray-800 rounded border border-gray-700">
-            <label className="flex items-center text-white cursor-pointer">
-              <input
-                type="checkbox"
-                checked={showAllPoints}
-                onChange={(e) => setShowAllPoints(e.target.checked)}
-                className="mr-2"
-              />
-              <span className="text-sm">
-                Mostrar todos los puntos ({visiblePoints.length} de {gazetteerData.length})
-              </span>
-            </label>
-            <p className="text-xs text-gray-400 mt-1">
-              Mostrando primeros {visiblePoints.length} puntos para mejor rendimiento
-            </p>
-            {hoveredFeature && !selectedFeature && (
-              <div className="mt-2 pt-2 border-t border-gray-700">
-                <p className="text-xs text-yellow-400">
-                  Hover: {hoveredFeature.properties.name}
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Visor de Cesium */}
-      <Viewer
-        ref={e => { viewerRef.current = e?.cesiumElement || null; }}
-        full
-        scene3DOnly={false}
-        homeButton={false}
-        sceneModePicker={true}
-        baseLayerPicker={false}
-        navigationHelpButton={false}
-        animation={false}
-        timeline={false}
-        fullscreenButton={false}
-        vrButton={false}
-      >
+      {/* Cesium Viewer */}
+      <div className="cesium-container">
+        <Viewer
+          ref={e => { viewerRef.current = e?.cesiumElement || null; }}
+          full
+          scene3DOnly={false}
+          homeButton={false}
+          sceneModePicker={true}
+          baseLayerPicker={false}
+          navigationHelpButton={false}
+          animation={false}
+          timeline={false}
+          fullscreenButton={false}
+          vrButton={false}
+        >
         <ImageryLayer imageryProvider={provider} />
         
         {/* Mostrar todos los puntos del gazetteer */}
@@ -226,7 +247,8 @@ const MapViewer: React.FC<MapViewerProps> = ({ currentBody }) => {
             }}
           />
         )}
-      </Viewer>
+        </Viewer>
+      </div>
     </div>
   );
 };

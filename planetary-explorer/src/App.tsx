@@ -1,70 +1,187 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import MapViewer from './components/MapViewer';
 import { type CelestialBody } from './services/wmts.service';
+import './App.css';
 
-function App() {
-  const [currentBody, setCurrentBody] = useState<CelestialBody>('moon');
+const App: React.FC = () => {
+  const [currentBody, setCurrentBody] = useState<CelestialBody>('earth');
+  const [is3DMode, setIs3DMode] = useState(true);
+  const [showTour, setShowTour] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  const celestialBodies: { key: CelestialBody; label: string; icon: string }[] = [
+    { key: 'earth', label: 'Earth', icon: '🌍' },
+    { key: 'moon', label: 'Moon', icon: '🌙' },
+    { key: 'mars', label: 'Mars', icon: '🔴' }
+  ];
 
   return (
-    <div className="w-full h-screen relative">
-      {/* Selector de cuerpos celestes */}
-      <div className="absolute top-4 right-4 z-10">
-        <div className="bg-gray-900/90 backdrop-blur rounded-lg p-2 shadow-lg flex gap-2">
+    <div className="app">
+      {/* Header */}
+      <header className="header">
+        <div className="header-left">
           <button
-            onClick={() => setCurrentBody('earth')}
-            className={`px-4 py-2 rounded font-medium transition-all ${
-              currentBody === 'earth'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
+            className={`mode-toggle ${is3DMode ? 'active' : ''}`}
+            onClick={() => setIs3DMode(!is3DMode)}
+            title="Toggle 3D Mode"
           >
-            🌍 Tierra
-          </button>
-          <button
-            onClick={() => setCurrentBody('moon')}
-            className={`px-4 py-2 rounded font-medium transition-all ${
-              currentBody === 'moon'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            🌙 Luna
-          </button>
-          <button
-            onClick={() => setCurrentBody('mars')}
-            className={`px-4 py-2 rounded font-medium transition-all ${
-              currentBody === 'mars'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            🔴 Marte
+            <span className="icon">3D</span>
           </button>
         </div>
-      </div>
 
-      {/* Info panel */}
-      <div className="absolute bottom-4 left-4 z-10">
-        <div className="bg-gray-900/90 backdrop-blur rounded-lg p-4 shadow-lg max-w-md">
-          <h2 className="text-white font-bold text-lg mb-2">
-            Explorador Planetario NASA WMTS
-          </h2>
-          <p className="text-gray-300 text-sm">
-            Explorando: <span className="font-bold text-blue-400">
-              {currentBody === 'earth' ? 'Tierra' : currentBody === 'moon' ? 'Luna' : 'Marte'}
+        <div className="header-center">
+          <div className="body-selector">
+            {celestialBodies.map((body) => (
+              <button
+                key={body.key}
+                className={`body-button ${currentBody === body.key ? 'active' : ''}`}
+                onClick={() => setCurrentBody(body.key)}
+                title={`Switch to ${body.label}`}
+              >
+                <span className="body-icon">{body.icon}</span>
+                <span className="body-label">{body.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="header-right">
+          <button
+            className={`action-button ${showTour ? 'active' : ''}`}
+            onClick={() => setShowTour(!showTour)}
+            title="Guided Tour"
+          >
+            <span className="icon">🎯</span>
+            <span className="label">Tour</span>
+          </button>
+          <button
+            className={`action-button ${showHelp ? 'active' : ''}`}
+            onClick={() => setShowHelp(!showHelp)}
+            title="Help & Info"
+          >
+            <span className="icon">?</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="main-content">
+        {/* Solar 3D Panel */}
+        <aside className="solar-panel">
+          <div className="panel-header">
+            <h3>Solar System</h3>
+            <div className="view-toggle">
+              <button className="toggle-btn active">3D</button>
+              <button className="toggle-btn">2D</button>
+            </div>
+          </div>
+          <div className="solar-system-view">
+            <div className="sun">☀️</div>
+            <div className="orbit earth-orbit">
+              <div className={`planet earth ${currentBody === 'earth' ? 'active' : ''}`}>🌍</div>
+            </div>
+            <div className="orbit moon-orbit">
+              <div className={`planet moon ${currentBody === 'moon' ? 'active' : ''}`}>🌙</div>
+            </div>
+            <div className="orbit mars-orbit">
+              <div className={`planet mars ${currentBody === 'mars' ? 'active' : ''}`}>🔴</div>
+            </div>
+          </div>
+          <div className="planet-info">
+            <h4>{currentBody.charAt(0).toUpperCase() + currentBody.slice(1)}</h4>
+            <div className="info-grid">
+              <div className="info-item">
+                <span className="label">Distance from Sun</span>
+                <span className="value">
+                  {currentBody === 'earth' ? '149.6M km' : 
+                   currentBody === 'moon' ? '149.6M km' : '227.9M km'}
+                </span>
+              </div>
+              <div className="info-item">
+                <span className="label">Diameter</span>
+                <span className="value">
+                  {currentBody === 'earth' ? '12,742 km' : 
+                   currentBody === 'moon' ? '3,474 km' : '6,779 km'}
             </span>
-          </p>
-          <p className="text-gray-400 text-xs mt-2">
-            Usa la barra de búsqueda para encontrar lugares específicos. 
-            Click en un resultado para volar ahí y ver el marcador rojo.
-          </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Map Viewer */}
+        <main className="map-container">
+          <MapViewer currentBody={currentBody} />
+        </main>
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="bottom-controls">
+        {/* Chat Panel */}
+        <aside className="chat-panel">
+          <div className="chat-header">
+            <h4>Mission Control</h4>
+            <button className="chat-toggle">💬</button>
+          </div>
+          <div className="chat-messages">
+            <div className="message system">
+              <span className="timestamp">14:32</span>
+              <span className="text">Welcome to Planetary Explorer</span>
+            </div>
+            <div className="message user">
+              <span className="timestamp">14:33</span>
+              <span className="text">Exploring {currentBody}...</span>
+            </div>
+          </div>
+          <div className="chat-input">
+            <input type="text" placeholder="Ask about planetary features..." />
+            <button>Send</button>
+          </div>
+        </aside>
+
+        {/* Floating Controls */}
+        <div className="floating-controls">
+          <button className="control-btn time-control" title="Time Controls">
+            <span className="icon">⏰</span>
+            <span className="label">Time</span>
+          </button>
+          <button className="control-btn compare-control" title="Compare Bodies">
+            <span className="icon">⚖️</span>
+            <span className="label">Compare</span>
+          </button>
+          <button className="control-btn annotate-control" title="Add Annotations">
+            <span className="icon">📝</span>
+            <span className="label">Annotate</span>
+          </button>
         </div>
       </div>
 
-      {/* Visor de mapas */}
-      <MapViewer currentBody={currentBody} />
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="modal-overlay" onClick={() => setShowHelp(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Planetary Explorer Help</h2>
+              <button className="close-btn" onClick={() => setShowHelp(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <h3>Navigation</h3>
+              <ul>
+                <li><strong>Mouse:</strong> Pan, zoom, and rotate the view</li>
+                <li><strong>Scroll:</strong> Zoom in/out</li>
+                <li><strong>Right-click + drag:</strong> Rotate view</li>
+              </ul>
+              <h3>Features</h3>
+              <ul>
+                <li><strong>Search:</strong> Find locations by name</li>
+                <li><strong>Body Selection:</strong> Switch between Earth, Moon, and Mars</li>
+                <li><strong>3D Mode:</strong> Toggle between 2D and 3D views</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-export default App
+export default App;
