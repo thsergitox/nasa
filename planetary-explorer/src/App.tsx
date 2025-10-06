@@ -1141,26 +1141,36 @@ const App: React.FC = () => {
             <div className="accordion-section">
               <div className="moon-data-menu">
                 <h2 className="moon-data-title">Apollo Missions</h2>
-                {/* Test button to manually trigger LROC */}
-                <button
-                  onClick={() => {
-                    console.log('Test button clicked - activating LROC for Apollo 11');
-                    setSelectedApolloSite(11);
-                    setShowLROCView(true);
-                  }}
-                  style={{
-                    background: '#4a9eff',
-                    color: 'white',
-                    padding: '10px 20px',
-                    margin: '10px 0',
-                    borderRadius: '5px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    width: '100%'
-                  }}
-                >
-                  🚀 Test LROC View (Apollo 11)
-                </button>
+                {/* Comparison buttons */}
+                <div className="comparison-buttons">
+                  <h4 className="comparison-title">LROC Comparison</h4>
+                  <div className="button-group">
+                    {apolloMissions.map(mission => {
+                      const missionNumber = parseInt(mission.name.replace('Apollo ', ''));
+                      if (isNaN(missionNumber)) return null;
+                      return (
+                        <button
+                          key={mission.name}
+                          onClick={() => {
+                            setSelectedApolloSite(missionNumber);
+                            setShowLROCView(true);
+                            const missionData = apolloMissions.find(m => m.name === mission.name);
+                            if (missionData) {
+                              const missionFeatureNames = missionData.features.map((f: any) => f.name);
+                              const features = gazetteerData.filter(f =>
+                                missionFeatureNames.includes(f.properties.name)
+                              );
+                              setFeaturesToShow(features);
+                            }
+                          }}
+                          className="comparison-button"
+                        >
+                          Apollo {missionNumber}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <MoonToursAccordion
                   apolloMissions={apolloMissions}
                   gazetteerData={gazetteerData}
@@ -1172,6 +1182,24 @@ const App: React.FC = () => {
                   featuresToShow={featuresToShow}
                   onApolloSiteSelect={(missionNumber) => {
                     console.log('Apollo site selected from accordion:', missionNumber);
+                    
+                    // Limpiar estado anterior y seleccionar solo la nueva misión
+                    const mission = apolloMissions.find(m => 
+                      parseInt(m.name.replace('Apollo ', '')) === missionNumber
+                    );
+                    
+                    if (mission) {
+                      // Obtener solo las features de esta misión
+                      const missionFeatureNames = mission.features.map((f: any) => f.name);
+                      const features = gazetteerData.filter(f => 
+                        missionFeatureNames.includes(f.properties.name)
+                      );
+                      setFeaturesToShow(features);
+                    } else {
+                      setFeaturesToShow([]);
+                    }
+                    
+                    // Actualizar el sitio Apollo seleccionado para LROC
                     setSelectedApolloSite(missionNumber);
                     setShowLROCView(true);
                     console.log('showLROCView set to true, selectedApolloSite:', missionNumber);
