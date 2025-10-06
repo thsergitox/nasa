@@ -287,8 +287,8 @@ const MapViewer: React.FC<MapViewerProps> = ({
           if (path) {
             try {
               const dataSource = await Cesium.GeoJsonDataSource.load(path, {
-                stroke: Cesium.Color.YELLOW,
-                fill: Cesium.Color.YELLOW.withAlpha(0.3),
+                stroke: Cesium.Color.CYAN,
+                fill: Cesium.Color.TRANSPARENT,
                 strokeWidth: 3,
               });
               viewer.dataSources.add(dataSource);
