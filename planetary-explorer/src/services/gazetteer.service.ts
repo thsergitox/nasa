@@ -13,6 +13,8 @@ export interface GazetteerFeature {
     lat: number;
     lon_east_0_360?: number;
     lon_westneg_180?: number;
+    has_polygon?: boolean;
+    mission?: string;
   };
 }
 
@@ -21,8 +23,58 @@ export interface GazetteerCollection {
   features: GazetteerFeature[];
 }
 
+// Definición de la estructura para las misiones Apollo
+export interface ApolloTour {
+  name: string;
+  path: string;
+}
+
+export interface ApolloMission {
+  name: string;
+  features: {
+    name: string;
+    path: string;
+  }[];
+  tours?: ApolloTour[];
+}
+
 // Cache para los datos cargados
 const dataCache: Map<CelestialBody, GazetteerCollection> = new Map();
+const missionsCache: Map<string, ApolloMission[]> = new Map();
+let missionsLoaded = false;
+
+// Función para cargar los datos de las misiones Apollo
+export const loadApolloMissions = async (): Promise<ApolloMission[]> => {
+  if (missionsLoaded) {
+    return missionsCache.get('apollo') || [];
+  }
+
+  try {
+    const response = await fetch('/data/apollo_missions.json');
+    if (!response.ok) {
+      throw new Error('Failed to load Apollo missions data');
+    }
+    const data: { missions: ApolloMission[] } = await response.json();
+    missionsCache.set('apollo', data.missions);
+    missionsLoaded = true;
+    return data.missions;
+  } catch (error) {
+    console.error('Error loading Apollo missions data:', error);
+    return [];
+  }
+};
+
+// Función para obtener el path del polígono para un feature
+export const getPolygonPath = async (featureName: string): Promise<string | undefined> => {
+  const missions = await loadApolloMissions();
+  for (const mission of missions) {
+    const feature = mission.features.find(f => f.name === featureName);
+    if (feature) {
+      return feature.path;
+    }
+  }
+  return undefined;
+};
 
 // Función para cargar datos GeoJSON del gazetteer
 export const loadGazetteerData = async (body: CelestialBody): Promise<GazetteerCollection> => {
@@ -53,6 +105,24 @@ export const loadGazetteerData = async (body: CelestialBody): Promise<GazetteerC
     }
     const data: GazetteerCollection = await response.json();
     
+    // Cargar datos de misiones y actualizar features
+    if (body === 'moon') {
+      const missions = await loadApolloMissions();
+      const missionFeatureNames = new Map<string, string>();
+      missions.forEach(mission => {
+        mission.features.forEach(feature => {
+          missionFeatureNames.set(feature.name, mission.name);
+        });
+      });
+
+      data.features.forEach(feature => {
+        if (missionFeatureNames.has(feature.properties.name)) {
+          feature.properties.has_polygon = true;
+          feature.properties.mission = missionFeatureNames.get(feature.properties.name);
+        }
+      });
+    }
+
     // Guardar en cache
     dataCache.set(body, data);
     

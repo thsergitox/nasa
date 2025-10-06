@@ -1,0 +1,62 @@
+[
+  {
+    "mission": "Apollo 11",
+    "reference_site": "Mare Tranquillitatis",
+    "reference_coordinates": {
+      "lat": 8.3487,
+      "lon": 30.8346
+    },
+    "landing_coordinates": {
+      "lat": 0.67408,
+      "lon": 23.47297
+    }
+  },
+  {
+    "mission": "Apollo 14",
+    "reference_site": "Fra Mauro",
+    "reference_coordinates": {
+      "lat": -6.061,
+      "lon": -16.9738
+    },
+    "landing_coordinates": {
+      "lat": -3.6453,
+      "lon": -17.47136
+    }
+  },
+  {
+    "mission": "Apollo 15",
+    "reference_site": "Rima Hadley",
+    "reference_coordinates": {
+      "lat": 25.7159,
+      "lon": 3.1467
+    },
+    "landing_coordinates": {
+      "lat": 26.13222,
+      "lon": 3.63386
+    }
+  },
+  {
+    "mission": "Apollo 16",
+    "reference_site": "Descartes",
+    "reference_coordinates": {
+      "lat": -11.7428,
+      "lon": 15.6667
+    },
+    "landing_coordinates": {
+      "lat": -8.97301,
+      "lon": 15.50019
+    }
+  },
+  {
+    "mission": "Apollo 17",
+    "reference_site": "Taurus-Littrow Valley",
+    "reference_coordinates": {
+      "lat": 20.0702,
+      "lon": 30.7867
+    },
+    "landing_coordinates": {
+      "lat": 20.1908,
+      "lon": 30.77239
+    }
+  }
+]

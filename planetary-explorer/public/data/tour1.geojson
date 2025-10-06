@@ -1,0 +1,217 @@
+[
+{
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                23.47369999999998,
+                0.6741
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Apollo 11 descent",
+            "feature_type": null,
+            "lat": 0.6741,
+            "lon_east_0_360": 23.4737,
+            "lon_westneg_180": 23.47369999999998
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.834599999999995,
+                8.3487
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mare Tranquillitatis Ref. apollo 11",
+            "feature_type": null,
+            "lat": 8.3487,
+            "lon_east_0_360": 30.8346,
+            "lon_westneg_180": 30.834599999999995
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                40.019039999999999,
+                1.18
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mount Marilyn Ref. apollo 11",
+            "feature_type": null,
+            "lat": 1.18,
+            "lon_east_0_360": 40.1904,
+            "lon_westneg_180": 40.19039999999999
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                26.13289999999999,
+                3.6333
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Apollo 15 descent",
+            "feature_type": null,
+            "lat": 3.6333,
+            "lon_east_0_360": 26.1329,
+            "lon_westneg_180": 26.13289999999999
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                3.14670000000001,
+                25.7159
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Rima Hadley Ref. apollo 15",
+            "feature_type": null,
+            "lat": 25.7159,
+            "lon_east_0_360": 3.1467,
+            "lon_westneg_180": 3.14670000000001
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                26.68589999999999,
+                4.1183
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "mons hadley Ref. apollo 15",
+            "feature_type": null,
+            "lat": 4.1665,
+            "lon_east_0_360": 26.6859,
+            "lon_westneg_180": 26.68589999999999
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                15.501899999999992,
+                -8.9733
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Apollo 16 descent",
+            "feature_type": null,
+            "lat": -8.9733,
+            "lon_east_0_360": 15.5019,
+            "lon_westneg_180": 15.501899999999992
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                15.666699999999992,
+                -11.7428
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Descartes Ref. apollo 16",
+            "feature_type": null,
+            "lat": -11.7428,
+            "lon_east_0_360": 15.6667,
+            "lon_westneg_180": 15.666699999999992
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                -17.47380000000001,
+                -3.6453
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Apollo 14 descent",
+            "feature_type": null,
+            "lat": -3.6453,
+            "lon_east_0_360": -17.4738,
+            "lon_westneg_180": -17.47380000000001
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                -16.97380000000001,
+                -6.061
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Fra Mauro Ref. apollo 14",
+            "feature_type": null,
+            "lat": -6.061,
+            "lon_east_0_360": -16.9738,
+            "lon_westneg_180": -16.97380000000001
+        }
+    },{
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.786699999999996,
+                20.0702
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Apollo 17 descent",
+            "feature_type": null,
+            "lat": 20.0702,
+            "lon_east_0_360": 30.7867,
+            "lon_westneg_180": 30.786699999999996
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.786699999999996,
+                20.0702
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Taurus-Littrow Valley Ref. apollo 17",
+            "feature_type": null,
+            "lat": 20.0702,
+            "lon_east_0_360": 30.7867,
+            "lon_westneg_180": 30.786699999999996
+        }
+    }
+]

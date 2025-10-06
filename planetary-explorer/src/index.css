@@ -2,21 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Override Tailwind's base styles for space theme */
+@layer base {
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #0a0a0f;
+    color: #ffffff;
+  }
 
-#root {
-  width: 100%;
-  height: 100vh;
-}
+  #root {
+    width: 100vw;
+    height: 100vh;
+  }
 
-.cesium-viewer {
-  width: 100%;
-  height: 100%;
+  /* Cesium Viewer Styles */
+  .cesium-viewer {
+    width: 100%;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Override Cesium's default styles for better integration */
+  .cesium-viewer-bottom {
+    display: none !important;
+  }
+
+  .cesium-viewer-toolbar {
+    display: none !important;
+  }
+
+  .cesium-viewer-cesiumInspectorContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-geocoderContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-homeButtonContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-navigationHelpButtonContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-baseLayerPickerContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-sceneModePickerContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-timelineContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-animationContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-fullscreenButtonContainer {
+    display: none !important;
+  }
+
+  .cesium-viewer-vrButtonContainer {
+    display: none !important;
+  }
 }
