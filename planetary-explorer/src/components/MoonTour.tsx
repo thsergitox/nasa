@@ -11,12 +11,7 @@ interface MoonTourProps {
 }
 
 const MoonTour: React.FC<MoonTourProps> = ({
-  apolloMissions,
-  currentTourStep,
-  isTourPlaying,
   selectedApolloMission,
-  setCurrentTourStep,
-  setIsTourPlaying,
   setSelectedApolloMission
 }) => {
   return (

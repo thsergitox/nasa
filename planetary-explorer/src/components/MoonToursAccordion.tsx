@@ -42,7 +42,6 @@ const MoonToursAccordion: React.FC<MoonToursAccordionProps> = ({
 }) => {
   const [expandedMission, setExpandedMission] = useState<string | null>(null);
   const [apolloInfo, setApolloInfo] = useState<{ [key: string]: ApolloInfo } | null>(null);
-  const [selectedFeatures, setSelectedFeatures] = useState<Set<string>>(new Set());
 
   // Cargar información de las misiones Apollo
   useEffect(() => {
@@ -59,11 +58,6 @@ const MoonToursAccordion: React.FC<MoonToursAccordionProps> = ({
       .catch(error => console.error('Error loading Apollo info:', error));
   }, []);
 
-  // Actualizar las features seleccionadas cuando cambien
-  useEffect(() => {
-    const selectedSet = new Set(featuresToShow.map(f => f.properties.name));
-    setSelectedFeatures(selectedSet);
-  }, [featuresToShow]);
 
   const toggleMission = (missionName: string) => {
     setExpandedMission(expandedMission === missionName ? null : missionName);

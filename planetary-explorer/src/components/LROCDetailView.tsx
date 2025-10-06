@@ -97,12 +97,19 @@ interface LROCDetailViewProps {
 const LROCDetailView: React.FC<LROCDetailViewProps> = ({ apolloMission, onClose, isVisible }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
+  const [showDetails, setShowDetails] = React.useState(true);
 
   useEffect(() => {
     if (!mapRef.current || !isVisible) return;
 
     const site = apolloSites[apolloMission];
     if (!site) return;
+
+    // Clear previous map instance
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setTarget(undefined);
+      mapInstanceRef.current = null;
+    }
 
     // Create OpenLayers map
     const map = new Map({
@@ -191,7 +198,7 @@ const LROCDetailView: React.FC<LROCDetailViewProps> = ({ apolloMission, onClose,
   const site = apolloSites[apolloMission];
   if (!site) return null;
 
-  // Add loading state for smooth transition
+  // Add loading state for smooth transition and reset details panel
   useEffect(() => {
     if (isVisible && mapInstanceRef.current) {
       // Force map to update size after animation completes
@@ -199,7 +206,9 @@ const LROCDetailView: React.FC<LROCDetailViewProps> = ({ apolloMission, onClose,
         mapInstanceRef.current?.updateSize();
       }, 600);
     }
-  }, [isVisible]);
+    // Reset details panel visibility when mission changes
+    setShowDetails(true);
+  }, [isVisible, apolloMission]);
 
   return (
     <div className={`lroc-detail-view ${isVisible ? 'visible' : ''}`}>
@@ -245,7 +254,16 @@ const LROCDetailView: React.FC<LROCDetailViewProps> = ({ apolloMission, onClose,
       <div ref={mapRef} className="lroc-map" />
       
       {/* Mission Details Panel */}
-      <div className="lroc-details-panel">
+      <div className={`lroc-details-panel ${showDetails ? 'visible' : 'hidden'}`}>
+        <button
+          className="details-close-button"
+          onClick={() => setShowDetails(false)}
+          title="Hide Mission Details"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
         <div className="lroc-details-content">
           <div className="detail-section">
             <h4>Mission Details</h4>
@@ -278,6 +296,19 @@ const LROCDetailView: React.FC<LROCDetailViewProps> = ({ apolloMission, onClose,
           </div>
         </div>
       </div>
+      
+      {/* Button to show details when hidden */}
+      {!showDetails && (
+        <button
+          className="details-show-button"
+          onClick={() => setShowDetails(true)}
+          title="Show Mission Details"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/>
+          </svg>
+        </button>
+      )}
     </div>
   );
 };

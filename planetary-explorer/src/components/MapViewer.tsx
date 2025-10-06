@@ -8,7 +8,6 @@ import {
   convertLonTo180,
   searchFeaturesByName,
   getPolygonPath,
-  loadApolloMissions,
   type ApolloTour
 } from '../services/gazetteer.service';
 import { 
@@ -83,7 +82,6 @@ const MapViewer: React.FC<MapViewerProps> = ({
   const [showAllPoints, setShowAllPoints] = useState(true);
   const [visiblePoints, setVisiblePoints] = useState<GazetteerFeature[]>([]);
   const [hoveredFeature, setHoveredFeature] = useState<GazetteerFeature | null>(null);
-  const [dataSearchTerm, setDataSearchTerm] = useState('');
   const [currentCameraPosition, setCurrentCameraPosition] = useState<{lat: number, lon: number} | null>(null);
   const [cameraHeight, setCameraHeight] = useState<number>(0);
   const [polygonDataSources, setPolygonDataSources] = useState<Map<string, Cesium.GeoJsonDataSource>>(new Map());
@@ -384,140 +382,6 @@ const MapViewer: React.FC<MapViewerProps> = ({
     // No es necesario cambiar los polígonos visibles aquí, se maneja desde App.tsx
   };
 
-  // Função para filtrar opções de dados baseada na busca
-  const getFilteredDataOptions = () => {
-    const options = [];
-    
-    if (currentBody === 'earth') {
-      // Terra - opções temporariamente ocultas
-      return [];
-    }
-    
-    if (currentBody === 'moon') {
-      options.push(
-        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌙' },
-        { key: 'maria', label: 'Lunar Maria', description: 'Planícies de lava basáltica', icon: '🌊' },
-        { key: 'rilles', label: 'Rilles & Valleys', description: 'Rilles e vales lunares', icon: '🌊' }
-      );
-    }
-    
-    if (currentBody === 'mars') {
-      options.push(
-        { key: 'volcanoes', label: 'Volcanoes', description: 'Vulcões marcianos', icon: '🌋' },
-        { key: 'craters', label: 'Craters', description: 'Crateras de impacto', icon: '🌙' },
-        { key: 'canyons', label: 'Canyons', description: 'Sistema Valles Marineris', icon: '🏔️' },
-        { key: 'mountains', label: 'Mountains', description: 'Montanhas marcianas', icon: '⛰️' },
-        { key: 'polar', label: 'Polar Caps', description: 'Calotas polares', icon: '🧊' }
-      );
-    }
-    
-    // Filtrar baseado no termo de busca
-    if (!dataSearchTerm.trim()) {
-      return options;
-    }
-    
-    const searchLower = dataSearchTerm.toLowerCase();
-    return options.filter(option => 
-      option.label.toLowerCase().includes(searchLower) ||
-      option.description.toLowerCase().includes(searchLower) ||
-      option.key.toLowerCase().includes(searchLower)
-    );
-  };
-
-  // Função para obter informações detalhadas de uma feature
-  const getFeatureDetails = (featureName: string, body: CelestialBody): any => {
-    const featureDetails: { [key: string]: any } = {
-      'earth': {
-        'Mount Everest': {
-          description: 'Highest peak on Earth',
-          detailedDescription: 'Highest peak on Earth, located in the Himalayas. Its formation is the result of the collision between the Indian and Eurasian tectonic plates millions of years ago.',
-          data: [
-            { label: 'Altitude', value: '8,848 m' },
-            { label: 'Age', value: '60 million years' },
-            { label: 'First Ascent', value: 'May 29, 1953' }
-          ]
-        },
-        'Mount Kilimanjaro': {
-          description: 'Highest volcano in Africa',
-          detailedDescription: 'Dormant volcano in Tanzania, formed by three volcanic cones. Its glacier is disappearing due to climate change.',
-          data: [
-            { label: 'Altitude', value: '5,895 m' },
-            { label: 'Last Eruption', value: '150,000 years ago' },
-            { label: 'Type', value: 'Stratovolcano' }
-          ]
-        },
-        'Grand Canyon': {
-          description: 'Famous steep-sided canyon',
-          detailedDescription: 'Canyon carved by the Colorado River over millions of years, revealing ancient geological layers.',
-          data: [
-            { label: 'Depth', value: '1,857 m' },
-            { label: 'Length', value: '446 km' },
-            { label: 'Age', value: '6 million years' }
-          ]
-        }
-      },
-      'moon': {
-        'Tycho Crater': {
-          description: 'Prominent lunar impact crater',
-          detailedDescription: 'Impact crater formed millions of years ago. Its circular structure and elevated edges are typical characteristics of the oldest lunar craters.',
-          data: [
-            { label: 'Diameter', value: '93 km' },
-            { label: 'Depth', value: '3.6 km' },
-            { label: 'Age', value: '3.85 billion years' }
-          ]
-        },
-        'Copernicus Crater': {
-          description: 'Large lunar impact crater',
-          detailedDescription: 'One of the youngest and best-preserved craters on the Moon, with a bright ray system extending hundreds of kilometers.',
-          data: [
-            { label: 'Diameter', value: '96 km' },
-            { label: 'Depth', value: '3.8 km' },
-            { label: 'Age', value: '800 million years' }
-          ]
-        },
-        'Mare Tranquillitatis': {
-          description: 'Sea of Tranquility',
-          detailedDescription: 'Lunar sea where Apollo 11 landed in 1969. Formed by basaltic lava that filled a giant impact basin.',
-          data: [
-            { label: 'Diameter', value: '873 km' },
-            { label: 'Depth', value: '1.8 km' },
-            { label: 'Age', value: '3.8 billion years' }
-          ]
-        }
-      },
-      'mars': {
-        'Olympus Mons': {
-          description: 'Largest volcano in the solar system',
-          detailedDescription: 'The largest known volcano in the solar system, three times taller than Mount Everest. Its base extends hundreds of kilometers.',
-          data: [
-            { label: 'Altitude', value: '21.9 km' },
-            { label: 'Base Diameter', value: '624 km' },
-            { label: 'Last Activity', value: '25 million years' }
-          ]
-        },
-        'Gale Crater': {
-          description: 'Impact crater explored by Curiosity',
-          detailedDescription: 'Impact crater explored by the Curiosity rover since 2012. Contains evidence of an ancient aquatic environment.',
-          data: [
-            { label: 'Diameter', value: '154 km' },
-            { label: 'Depth', value: '3.7 km' },
-            { label: 'Age', value: '3.8 billion years' }
-          ]
-        },
-        'Valles Marineris': {
-          description: 'Largest canyon system on Mars',
-          detailedDescription: 'Giant canyon system extending thousands of kilometers, much larger than Earth\'s Grand Canyon.',
-          data: [
-            { label: 'Length', value: '4,000 km' },
-            { label: 'Depth', value: '7 km' },
-            { label: 'Width', value: '200 km' }
-          ]
-        }
-      }
-    };
-
-    return featureDetails[body]?.[featureName] || null;
-  };
 
 
   // Geological features data by celestial body - Temporarily disabled

@@ -7,8 +7,6 @@ import './components/MoonToursAccordion.css';
 import { 
   type GazetteerFeature, 
   loadGazetteerData, 
-  convertLonTo180,
-  searchFeaturesByName,
   loadApolloMissions,
   type ApolloMission,
   type ApolloTour
@@ -1117,10 +1115,9 @@ const App: React.FC = () => {
 
       {/* Apollo Landing Sites Page */}
       {currentPage === 'apollo-sites' && (
-        <div className="moon-data-page">
-          <div className="moon-data-content">
-            <div className="moon-data-left">
-              {/* Cesium Viewer */}
+        <div className="apollo-sites-wrapper">
+          <div className={`apollo-sites-container ${showLROCView ? 'with-lroc' : ''}`}>
+            <div className="map-section">
               <div className="cesium-container">
                 <MapViewer 
                   currentBody={currentBody} 
@@ -1134,15 +1131,36 @@ const App: React.FC = () => {
                   featuresToShow={featuresToShow}
                   selectedTour={selectedTour}
                   onApolloSiteClick={(missionNumber) => {
+                    console.log('Apollo site clicked:', missionNumber);
                     setSelectedApolloSite(missionNumber);
                     setShowLROCView(true);
                   }}
                 />
               </div>
             </div>
-            <div className="moon-data-right">
+            <div className="accordion-section">
               <div className="moon-data-menu">
                 <h2 className="moon-data-title">Apollo Missions</h2>
+                {/* Test button to manually trigger LROC */}
+                <button
+                  onClick={() => {
+                    console.log('Test button clicked - activating LROC for Apollo 11');
+                    setSelectedApolloSite(11);
+                    setShowLROCView(true);
+                  }}
+                  style={{
+                    background: '#4a9eff',
+                    color: 'white',
+                    padding: '10px 20px',
+                    margin: '10px 0',
+                    borderRadius: '5px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    width: '100%'
+                  }}
+                >
+                  🚀 Test LROC View (Apollo 11)
+                </button>
                 <MoonToursAccordion
                   apolloMissions={apolloMissions}
                   gazetteerData={gazetteerData}
@@ -1153,8 +1171,10 @@ const App: React.FC = () => {
                   selectedTour={selectedTour}
                   featuresToShow={featuresToShow}
                   onApolloSiteSelect={(missionNumber) => {
+                    console.log('Apollo site selected from accordion:', missionNumber);
                     setSelectedApolloSite(missionNumber);
                     setShowLROCView(true);
+                    console.log('showLROCView set to true, selectedApolloSite:', missionNumber);
                   }}
                 />
               </div>
@@ -1162,14 +1182,18 @@ const App: React.FC = () => {
           </div>
           {/* LROC Detail View - Outside container for overlay */}
           {selectedApolloSite && (
-            <LROCDetailView
-              apolloMission={selectedApolloSite}
-              onClose={() => {
-                setShowLROCView(false);
-                setTimeout(() => setSelectedApolloSite(null), 500);
-              }}
-              isVisible={showLROCView}
-            />
+            <>
+              {console.log('Rendering LROC view for mission:', selectedApolloSite, 'isVisible:', showLROCView)}
+              <LROCDetailView
+                apolloMission={selectedApolloSite}
+                onClose={() => {
+                  console.log('Closing LROC view');
+                  setShowLROCView(false);
+                  setTimeout(() => setSelectedApolloSite(null), 500);
+                }}
+                isVisible={showLROCView}
+              />
+            </>
           )}
         </div>
       )}
