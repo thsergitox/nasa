@@ -90,6 +90,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
     step: 'reference' | 'landing';
     missionDetails?: any;
   } | null>(null);
+  const [showTourCompletedNotification, setShowTourCompletedNotification] = useState<boolean>(false);
 
   // Função para voar para uma coordenada específica
   const flyToCoordinates = (lat: number, lon: number, height: number = 500000) => {
@@ -162,6 +163,11 @@ const MapViewer: React.FC<MapViewerProps> = ({
       console.log('Tour completed!');
       setIsTourPlaying(false);
       setCurrentTourInfo(null);
+      setShowTourCompletedNotification(true);
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => {
+        setShowTourCompletedNotification(false);
+      }, 5000);
       return;
     }
 
@@ -876,33 +882,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
           </div>
         </div>
         <div className="menu-items">
-          <button 
-            className="menu-item"
-            onClick={() => {
-              // Voltar para vista global da Lua
-              if (viewerRef.current) {
-                viewerRef.current.camera.flyTo({
-                  destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000),
-                  duration: 2.0,
-                  orientation: {
-                    heading: 0,
-                    pitch: Cesium.Math.toRadians(-90),
-                    roll: 0
-                  }
-                });
-              }
-            }}
-          >
-            <div className="menu-item-icon">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-              </svg>
-                </div>
-            <div className="menu-item-content">
-            <span className="menu-text">Home</span>
-              <span className="menu-description">Global view</span>
-            </div>
-          </button>
+          {/* Home button hidden as requested */}
           <button 
             className="menu-item"
             onClick={() => {
@@ -1316,6 +1296,31 @@ const MapViewer: React.FC<MapViewerProps> = ({
         })()}
         </Viewer>
       </div>
+
+      {/* Tour Completed Notification */}
+      {showTourCompletedNotification && (
+        <div className="tour-completed-notification">
+          <div className="notification-content">
+            <div className="notification-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div className="notification-text">
+              <h3>Tour Concluído!</h3>
+              <p>Você completou o tour das missões Apollo na Lua.</p>
+            </div>
+            <button 
+              className="notification-close"
+              onClick={() => setShowTourCompletedNotification(false)}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

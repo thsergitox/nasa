@@ -187,18 +187,102 @@ body {
   }
 }
 
+/* Tour Completed Notification */
+.tour-completed-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--space-surface);
+  border: 1px solid var(--space-accent);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  max-width: 400px;
+  min-width: 320px;
+}
+
+.notification-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--space-accent);
+  border-radius: 50%;
+  color: white;
+  flex-shrink: 0;
+}
+
+.notification-text {
+  flex: 1;
+}
+
+.notification-text h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--space-text-primary);
+}
+
+.notification-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--space-text-secondary);
+  line-height: 1.4;
+}
+
+.notification-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--space-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  background: var(--space-surface-hover);
+  color: var(--space-text-primary);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Action Buttons */
 .action-button {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
+  gap: 12px;
+  padding: 14px 24px;
   background: var(--space-surface);
   border: 1px solid var(--space-border);
   border-radius: var(--border-radius);
   color: var(--space-text-secondary);
   font-weight: 500;
-  font-size: 14px;
+  font-size: 16px;
   transition: all var(--transition-normal);
   cursor: pointer;
   position: relative;
@@ -326,13 +410,13 @@ body {
 }
 
 .toggle-btn {
-  padding: 6px 12px;
+  padding: 14px 24px;
   background: transparent;
   border: none;
   border-radius: var(--border-radius);
   color: var(--space-text-secondary);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   transition: all var(--transition-fast);
   cursor: pointer;
 }
