@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MapViewer from './components/MapViewer';
 import MoonToursAccordion from './components/MoonToursAccordion';
+import LROCDetailView from './components/LROCDetailView';
 import { type CelestialBody } from './services/wmts.service';
 import './components/MoonToursAccordion.css';
 import { 
@@ -44,6 +45,10 @@ const App: React.FC = () => {
 
   // Estado para el tour seleccionado
   const [selectedTour, setSelectedTour] = useState<ApolloTour | null>(null);
+  
+  // Estado para LROC Detail View
+  const [selectedApolloSite, setSelectedApolloSite] = useState<number | null>(null);
+  const [showLROCView, setShowLROCView] = useState<boolean>(false);
 
   // Nuevos estados para manejar la visualización en el mapa
   const [featuresToShow, setFeaturesToShow] = useState<GazetteerFeature[]>([]);
@@ -67,7 +72,7 @@ const App: React.FC = () => {
     loadApolloMissions().then(setApolloMissions);
   }, []);
 
-  // Carregar dados do gazetteer quando a página Moon Data for acessada
+  // Carregar dados do gazetteer quando a página Moon Data ou Apollo Sites for acessada
   useEffect(() => {
     if (currentPage === 'moon-data' || currentPage === 'apollo-sites') {
       console.log('Loading gazetteer data for:', currentBody);
@@ -78,6 +83,14 @@ const App: React.FC = () => {
       }).catch(error => {
         console.error('Error loading gazetteer data:', error);
       });
+      
+      // Also load Apollo missions for apollo-sites
+      if (currentPage === 'apollo-sites') {
+        loadApolloMissions().then(missions => {
+          console.log('Apollo missions loaded for apollo-sites:', missions.length);
+          setApolloMissions(missions);
+        });
+      }
     }
   }, [currentPage, currentBody]);
 
@@ -178,6 +191,7 @@ const App: React.FC = () => {
     // Limpiar tour cuando se selecciona una feature directamente
     setSelectedTour(null);
     setSelectedGazetteerFeature(feature);
+    
     // Chamar a função para voar para a feature no mapa
     if ((window as any).flyToFeature) {
       (window as any).flyToFeature(feature);
@@ -211,8 +225,27 @@ const App: React.FC = () => {
 
   // Función para manejar el clic en un tour
   const handleTourClick = (tour: ApolloTour) => {
-    // Limpiar completamente el estado anterior
-    setFeaturesToShow([]);
+    console.log('Tour clicked:', tour);
+    // Encontrar la misión que contiene este tour
+    const missionWithTour = apolloMissions.find((m: any) => 
+      m.tours && m.tours.some((t: any) => t.name === tour.name)
+    );
+    
+    if (missionWithTour) {
+      console.log('Found mission with tour:', missionWithTour.name);
+      // Obtener las features de la misión (igual que handleMissionClick)
+      const missionFeatureNames = missionWithTour.features.map((f: any) => f.name);
+      console.log('Mission feature names:', missionFeatureNames);
+      const features = gazetteerData.filter(f => 
+        missionFeatureNames.includes(f.properties.name)
+      );
+      console.log('Features to show:', features.length);
+      setFeaturesToShow(features);
+    } else {
+      console.log('No mission found for tour');
+      setFeaturesToShow([]);
+    }
+    
     setSelectedGazetteerFeature(null);
     setSelectedTour(tour);
   };
@@ -1100,6 +1133,10 @@ const App: React.FC = () => {
                   onNavigateToMoonTour={navigateToMoonTour}
                   featuresToShow={featuresToShow}
                   selectedTour={selectedTour}
+                  onApolloSiteClick={(missionNumber) => {
+                    setSelectedApolloSite(missionNumber);
+                    setShowLROCView(true);
+                  }}
                 />
               </div>
             </div>
@@ -1115,10 +1152,25 @@ const App: React.FC = () => {
                   onFeatureToggle={handleFeatureClickCheckbox}
                   selectedTour={selectedTour}
                   featuresToShow={featuresToShow}
+                  onApolloSiteSelect={(missionNumber) => {
+                    setSelectedApolloSite(missionNumber);
+                    setShowLROCView(true);
+                  }}
                 />
               </div>
             </div>
           </div>
+          {/* LROC Detail View - Outside container for overlay */}
+          {selectedApolloSite && (
+            <LROCDetailView
+              apolloMission={selectedApolloSite}
+              onClose={() => {
+                setShowLROCView(false);
+                setTimeout(() => setSelectedApolloSite(null), 500);
+              }}
+              isVisible={showLROCView}
+            />
+          )}
         </div>
       )}
 

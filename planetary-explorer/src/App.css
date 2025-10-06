@@ -1530,6 +1530,54 @@ body {
 }
 
 /* Moon Data Page */
+/* Apollo Sites Page with LROC Animation Support */
+.apollo-sites-wrapper {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 70px);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.apollo-sites-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.apollo-sites-container.with-lroc .map-section {
+  transform: translateX(-25%);
+  width: 50%;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.apollo-sites-container.with-lroc .accordion-section {
+  transform: translateX(-100%);
+  opacity: 0.3;
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.map-section {
+  flex: 1;
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.accordion-section {
+  width: 420px;
+  background: var(--space-surface);
+  border-left: 1px solid var(--space-border);
+  overflow-y: auto;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .moon-data-page {
   position: fixed;
   top: 70px;
@@ -2107,6 +2155,269 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* LROC Detail View Styles - Updated for better positioning */
+.lroc-detail-view {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  width: 50%;
+  height: calc(100vh - 70px);
+  background: var(--space-bg);
+  z-index: 2000;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
+}
+
+.lroc-detail-view.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Add glow effect when LROC is visible */
+.lroc-detail-view.visible::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, 
+    transparent,
+    var(--space-accent),
+    var(--space-accent),
+    transparent
+  );
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.lroc-header {
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--space-border);
+  padding: 20px 32px;
+  box-shadow: var(--shadow-md);
+}
+
+.lroc-header-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.lroc-mission-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(74, 158, 255, 0.1), rgba(90, 174, 255, 0.1));
+  border: 1px solid var(--space-accent);
+  border-radius: var(--border-radius);
+}
+
+.mission-number {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-accent);
+}
+
+.mission-icon {
+  font-size: 1.5rem;
+}
+
+.lroc-mission-info {
+  flex: 1;
+}
+
+.lroc-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--space-text-primary);
+  margin: 0 0 4px 0;
+}
+
+.lroc-subtitle {
+  font-size: 1rem;
+  color: var(--space-text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.lroc-coordinates {
+  display: flex;
+  gap: 16px;
+}
+
+.coord-badge,
+.resolution-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--space-accent);
+}
+
+.coord-badge svg,
+.resolution-badge svg {
+  opacity: 0.8;
+}
+
+.lroc-close-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  border: none;
+  border-radius: var(--border-radius);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+}
+
+.lroc-close-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(248, 113, 113, 0.4);
+}
+
+.lroc-close-button:active {
+  transform: translateY(0);
+}
+
+.lroc-map {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  background: #000;
+}
+
+.lroc-details-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--space-border);
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
+.lroc-details-content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.detail-section {
+  flex: 1;
+}
+
+.detail-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+  margin: 0 0 12px 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--space-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: var(--space-text-secondary);
+}
+
+.lroc-controls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.control-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.2);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--space-text-secondary);
+}
+
+.control-hint svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* Animation for loading */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lroc-detail-view.visible .lroc-header {
+  animation: fadeIn 0.6s ease 0.2s both;
+}
+
+.lroc-detail-view.visible .lroc-details-panel {
+  animation: fadeIn 0.6s ease 0.4s both;
 }
 
 /* Tour Controls */

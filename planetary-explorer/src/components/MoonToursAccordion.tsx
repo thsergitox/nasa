@@ -26,6 +26,7 @@ interface MoonToursAccordionProps {
   onFeatureToggle?: (feature: GazetteerFeature, isChecked: boolean) => void;
   selectedTour: ApolloTour | null;
   featuresToShow: GazetteerFeature[];
+  onApolloSiteSelect?: (missionNumber: number) => void;
 }
 
 const MoonToursAccordion: React.FC<MoonToursAccordionProps> = ({
@@ -36,7 +37,8 @@ const MoonToursAccordion: React.FC<MoonToursAccordionProps> = ({
   onMissionClick,
   onFeatureToggle,
   selectedTour,
-  featuresToShow
+  featuresToShow,
+  onApolloSiteSelect
 }) => {
   const [expandedMission, setExpandedMission] = useState<string | null>(null);
   const [apolloInfo, setApolloInfo] = useState<{ [key: string]: ApolloInfo } | null>(null);
@@ -88,8 +90,8 @@ const MoonToursAccordion: React.FC<MoonToursAccordionProps> = ({
     // Esto se manejará directamente en App.tsx
   };
 
-  const getMissionInfo = (missionName: string): ApolloInfo | null => {
-    if (!apolloInfo) return null;
+  const getMissionInfo = (missionName: string | undefined): ApolloInfo | null => {
+    if (!apolloInfo || !missionName) return null;
     const key = missionName.replace(' ', '_');
     return apolloInfo[key] || apolloInfo[missionName] || null;
   };
@@ -191,8 +193,16 @@ const MoonToursAccordion: React.FC<MoonToursAccordionProps> = ({
                         </label>
                         <button
                           className="site-goto-btn"
-                          onClick={() => onFeatureClick(gazetteerFeature)}
-                          title="Go to location"
+                          onClick={() => {
+                            // Extract mission number from mission name (e.g., "Apollo 11" -> 11)
+                            const missionNumber = parseInt(mission.name.replace('Apollo ', ''));
+                            if (onApolloSiteSelect && [11, 12, 14, 15, 16, 17].includes(missionNumber)) {
+                              onApolloSiteSelect(missionNumber);
+                            } else {
+                              onFeatureClick(gazetteerFeature);
+                            }
+                          }}
+                          title="View in LROC High Resolution"
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>

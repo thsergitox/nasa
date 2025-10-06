@@ -8,6 +8,7 @@ import {
   convertLonTo180,
   searchFeaturesByName,
   getPolygonPath,
+  loadApolloMissions,
   type ApolloTour
 } from '../services/gazetteer.service';
 import { 
@@ -44,6 +45,7 @@ interface MapViewerProps {
   isPlaying?: boolean;
   onTourStepComplete?: () => void;
   onFeatureSelect?: (feature: GazetteerFeature | null) => void;
+  onApolloSiteClick?: (missionNumber: number) => void;
 }
 
 const MapViewer: React.FC<MapViewerProps> = ({ 
@@ -57,7 +59,8 @@ const MapViewer: React.FC<MapViewerProps> = ({
   onNavigateToMoonTour,
   selectedTour,
   featuresToShow,
-  onFeatureSelect
+  onFeatureSelect,
+  onApolloSiteClick
 }) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
@@ -347,62 +350,12 @@ const MapViewer: React.FC<MapViewerProps> = ({
     }
   }, [featuresToShow]);
 
-  // Cargar tour seleccionado
+  // Effect para limpiar cuando se deselecciona un tour
   useEffect(() => {
-    if (!viewerRef.current) return;
-    const viewer = viewerRef.current;
-
-    // Función para limpiar todos los dataSources
-    const cleanupAllDataSources = () => {
-      // Limpiar polígonos anteriores
-      polygonDataSources.forEach(dataSource => {
-        try {
-          viewer.dataSources.remove(dataSource, true);
-        } catch (e) {
-          console.error('Error removing polygon dataSource:', e);
-        }
-      });
-      setPolygonDataSources(new Map());
-      
-      // Limpiar etiquetas anteriores
-      polygonLabels.forEach(label => {
-        try {
-          viewer.entities.remove(label);
-        } catch (e) {
-          console.error('Error removing label:', e);
-        }
-      });
-      setPolygonLabels(new Map());
-      
-      // Limpiar tour anterior
-      if (tourDataSource) {
-        try {
-          viewer.dataSources.remove(tourDataSource, true);
-        } catch (e) {
-          console.error('Error removing tour dataSource:', e);
-        }
-        setTourDataSource(null);
-      }
-    };
-
-    if (selectedTour) {
-      // Limpiar todo antes de cargar el nuevo tour
-      cleanupAllDataSources();
-      
-      Cesium.GeoJsonDataSource.load(selectedTour.path, {
-        stroke: Cesium.Color.CYAN,
-        strokeWidth: 5,
-      }).then(dataSource => {
-        viewer.dataSources.add(dataSource);
-        setTourDataSource(dataSource);
-        viewer.flyTo(dataSource, {
-          duration: 2.0,
-          offset: new Cesium.HeadingPitchRange(0, -Math.PI / 4, 0)
-        });
-      }).catch(error => {
-        console.error('Error loading tour:', selectedTour.path, error);
-      });
-    }
+    // Ya no necesitamos hacer nada aquí porque los polígonos se cargan
+    // a través del useEffect de featuresToShow
+    // Este useEffect puede ser removido completamente o dejado vacío
+    // para futuras funcionalidades específicas del tour
   }, [selectedTour]);
 
 
@@ -411,6 +364,18 @@ const MapViewer: React.FC<MapViewerProps> = ({
 
   // Função para lidar com clique em uma feature específica
   const handleFeatureClick = async (feature: GazetteerFeature) => {
+    // Check if it's an Apollo landing site and we're on apollo-sites page
+    if (currentPage === 'apollo-sites' && onApolloSiteClick) {
+      const apolloMatch = feature.properties.name.match(/Apollo[\s-]*(\d+)/i);
+      if (apolloMatch) {
+        const missionNumber = parseInt(apolloMatch[1]);
+        if ([11, 12, 14, 15, 16, 17].includes(missionNumber)) {
+          onApolloSiteClick(missionNumber);
+          return;
+        }
+      }
+    }
+    
     // Navegar para a feature selecionada
     flyToLocation(feature);
     
@@ -1013,9 +978,9 @@ const MapViewer: React.FC<MapViewerProps> = ({
           <button 
             className="menu-item"
             onClick={() => {
-              // Navegar para a página Moon Tour Map
-              if (onNavigateToMoonTour) {
-                onNavigateToMoonTour();
+              // Navegar para a página Apollo Landing Sites
+              if (onNavigateToApolloSites) {
+                onNavigateToApolloSites();
               }
             }}
           >
@@ -1029,6 +994,27 @@ const MapViewer: React.FC<MapViewerProps> = ({
               <span className="menu-description">Apollo missions</span>
                         </div>
           </button>
+          
+          <button 
+            className="menu-item"
+            onClick={() => {
+              // Navegar para a página Moon Tour Map
+              if (onNavigateToMoonTour) {
+                onNavigateToMoonTour();
+              }
+            }}
+          >
+            <div className="menu-item-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div className="menu-item-content">
+            <span className="menu-text">Moon Tour</span>
+              <span className="menu-description">Guided tour</span>
+            </div>
+          </button>
+          
           <div className="menu-item-container">
             <button 
               className="menu-item"
