@@ -1568,6 +1568,33 @@ body {
   position: relative;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: left center;
+  height: 100%;
+}
+
+/* Fix height issues for apollo-sites */
+.apollo-sites-container .map-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Direct cesium-container styling for apollo-sites */
+.apollo-sites-container .map-section .cesium-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #000;
+}
+
+/* Ensure Cesium canvas fills container */
+.apollo-sites-container .cesium-viewer,
+.apollo-sites-container .cesium-widget,
+.apollo-sites-container canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .accordion-section {
@@ -2164,6 +2191,7 @@ body {
   right: 0;
   width: 50%;
   height: calc(100vh - 70px);
+  z-index: 1000;
   background: var(--space-bg);
   z-index: 2000;
   transform: translateX(100%);
@@ -2323,6 +2351,65 @@ body {
   padding: 20px;
   box-shadow: var(--shadow-lg);
   z-index: 10;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Details close button */
+.details-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.details-close-button:hover {
+  background: rgba(255, 59, 48, 0.8);
+  transform: scale(1.1);
+}
+
+/* Show details button when panel is hidden */
+.details-show-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background: var(--space-accent);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+}
+
+.details-show-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(74, 158, 255, 0.5);
+}
+
+/* Details panel animation states */
+.lroc-details-panel.hidden {
+  transform: translateY(calc(100% + 40px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lroc-details-panel.visible {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .lroc-details-content {
