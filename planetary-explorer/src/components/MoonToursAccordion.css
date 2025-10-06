@@ -1,0 +1,243 @@
+.moon-tours-accordion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accordion-item {
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(100, 100, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.accordion-item:hover {
+  border-color: rgba(100, 100, 255, 0.4);
+}
+
+.accordion-header {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.accordion-header:hover {
+  background: rgba(100, 100, 255, 0.1);
+}
+
+.accordion-header.expanded {
+  background: rgba(100, 100, 255, 0.15);
+  border-bottom: 1px solid rgba(100, 100, 255, 0.2);
+}
+
+.accordion-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mission-title-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mission-icon {
+  font-size: 20px;
+}
+
+.mission-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.mission-year {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 2px 8px;
+  background: rgba(100, 100, 255, 0.2);
+  border-radius: 12px;
+}
+
+.accordion-arrow {
+  transition: transform 0.3s ease;
+}
+
+.accordion-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  padding: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mission-description {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border-left: 3px solid rgba(100, 100, 255, 0.5);
+}
+
+.mission-description p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mission-actions {
+  margin-bottom: 16px;
+}
+
+.select-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(100, 100, 255, 0.3), rgba(50, 50, 200, 0.3));
+  border: 1px solid rgba(100, 100, 255, 0.4);
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.select-all-btn:hover {
+  background: linear-gradient(135deg, rgba(100, 100, 255, 0.4), rgba(50, 50, 200, 0.4));
+  transform: translateY(-1px);
+}
+
+.mission-sites {
+  margin-bottom: 16px;
+}
+
+.sites-header,
+.tours-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.site-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.site-item:hover {
+  background: rgba(100, 100, 255, 0.1);
+}
+
+.site-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #6464ff;
+}
+
+.site-label {
+  flex: 1;
+  cursor: pointer;
+}
+
+.site-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.site-name {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.site-description {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.site-goto-btn {
+  padding: 6px;
+  background: rgba(100, 100, 255, 0.2);
+  border: 1px solid rgba(100, 100, 255, 0.3);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.site-goto-btn:hover {
+  background: rgba(100, 100, 255, 0.3);
+  color: white;
+  transform: scale(1.1);
+}
+
+.mission-tours {
+  padding-top: 12px;
+  border-top: 1px solid rgba(100, 100, 255, 0.2);
+}
+
+.tour-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(50, 50, 100, 0.2);
+  border: 1px solid rgba(100, 100, 255, 0.2);
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.tour-item:hover {
+  background: rgba(100, 100, 255, 0.25);
+  transform: translateX(4px);
+}
+
+.tour-item.selected {
+  background: rgba(100, 100, 255, 0.35);
+  border-color: rgba(100, 100, 255, 0.5);
+}
+
+.tour-name {
+  flex: 1;
+  font-size: 14px;
+}
+
+.tour-arrow {
+  color: rgba(255, 255, 255, 0.6);
+}

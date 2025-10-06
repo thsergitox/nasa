@@ -1118,6 +1118,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 16px;
 }
 
 .data-item {
@@ -1147,12 +1148,119 @@ body {
   font-family: 'Courier New', monospace;
 }
 
+/* Official Information Section */
+.feature-official-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(74, 158, 255, 0.05);
+  border: 1px solid rgba(74, 158, 255, 0.2);
+  border-radius: 8px;
+}
+
+.official-info-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Reference Information Section */
+.feature-reference-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.reference-info-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reference-item {
+  margin-bottom: 8px;
+}
+
+.reference-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.reference-url {
+  margin-top: 8px;
+}
+
+.reference-link {
+  color: var(--space-accent);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.reference-link:hover {
+  color: var(--space-accent-hover);
+  text-decoration: underline;
+}
+
+/* Flag/Historical Information Section */
+.feature-flag-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(251, 191, 36, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 8px;
+}
+
+.flag-info-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-warning);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.flag-content p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Coordinates Section */
+.feature-coordinates {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.coordinates-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 /* Feature Info Panel - Left Side */
 .feature-info-panel-left {
   position: fixed;
   top: 90px;
   left: 20px;
-  width: 320px;
+  width: 380px;
+  max-height: calc(100vh - 110px);
   background: rgba(15, 15, 35, 0.95);
   border: 1px solid rgba(74, 158, 255, 0.2);
   border-radius: 16px;
@@ -1161,6 +1269,7 @@ body {
   z-index: 1000;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   animation: slideInFromLeft 0.3s ease-out;
+  overflow-y: auto;
 }
 
 @keyframes slideInFromLeft {
@@ -1816,6 +1925,452 @@ body {
   margin-top: 12px;
 }
 
+/* Moon Tour Page */
+.moon-tour-page {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 70px);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* Moon Tour Map Page */
+.moon-tour-map-page {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 70px);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.moon-tour-content {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  height: 100%;
+}
+
+.moon-tour-map-content {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  height: 100%;
+}
+
+.moon-tour-left {
+  position: relative;
+  background: var(--space-bg);
+}
+
+.moon-tour-map-left {
+  position: relative;
+  background: var(--space-bg);
+}
+
+.moon-tour-right {
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--space-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.moon-tour-map-right {
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border-left: 1px solid var(--space-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.moon-tour-menu {
+  padding: 32px 28px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.moon-tour-map-menu {
+  padding: 32px 28px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.moon-tour-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--space-text-primary);
+  margin: 0;
+  background: linear-gradient(135deg, #4a9eff 0%, #5aaeff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.moon-tour-map-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--space-text-primary);
+  margin: 0;
+  background: linear-gradient(135deg, #4a9eff 0%, #5aaeff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Tour Controls */
+.tour-controls {
+  background: var(--space-surface);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  border: 1px solid var(--space-border);
+}
+
+.tour-controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tour-controls-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+}
+
+.tour-controls-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.tour-control-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--space-surface-hover);
+  border: 1px solid var(--space-border);
+  border-radius: 8px;
+  color: var(--space-text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.tour-control-btn:hover:not(:disabled) {
+  background: var(--space-accent);
+  color: var(--space-text-primary);
+  border-color: var(--space-accent);
+}
+
+.tour-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tour-control-btn.playing {
+  background: var(--space-accent);
+  color: var(--space-text-primary);
+  border-color: var(--space-accent);
+}
+
+.tour-progress {
+  margin-top: 16px;
+}
+
+.tour-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--space-surface-hover);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.tour-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--space-accent) 0%, var(--space-accent-hover) 100%);
+  transition: width 0.3s ease;
+}
+
+.tour-progress-text {
+  font-size: 0.85rem;
+  color: var(--space-text-muted);
+  text-align: center;
+}
+
+/* Apollo Missions Section */
+.apollo-missions-section {
+  flex: 1;
+}
+
+.missions-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+  margin-bottom: 16px;
+}
+
+.missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mission-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--space-surface);
+  border: 1px solid var(--space-border);
+  border-radius: var(--border-radius);
+  color: var(--space-text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.mission-item:hover {
+  background: var(--space-surface-hover);
+  border-color: var(--space-accent);
+}
+
+.mission-item.active {
+  background: var(--space-accent);
+  border-color: var(--space-accent);
+  color: var(--space-text-primary);
+}
+
+.mission-item.current {
+  border-color: var(--space-warning);
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+}
+
+.mission-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mission-number {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mission-year {
+  font-size: 0.85rem;
+  color: var(--space-text-muted);
+}
+
+.mission-item.active .mission-year {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.mission-item-arrow {
+  font-size: 1.2rem;
+  color: var(--space-text-muted);
+  transition: var(--transition-fast);
+}
+
+.mission-item:hover .mission-item-arrow {
+  color: var(--space-accent);
+  transform: translateX(4px);
+}
+
+/* Apollo Info Panel */
+.apollo-info-panel-left {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 400px;
+  max-height: 60vh;
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--space-border);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.apollo-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--space-border);
+}
+
+.apollo-info-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.apollo-info-icon {
+  font-size: 1.5rem;
+}
+
+.apollo-info-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+}
+
+.apollo-info-close {
+  background: none;
+  border: none;
+  color: var(--space-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+}
+
+.apollo-info-close:hover {
+  background: var(--space-surface-hover);
+  color: var(--space-text-primary);
+}
+
+.apollo-info-subtitle {
+  padding: 0 24px 16px;
+  font-size: 0.9rem;
+  color: var(--space-text-muted);
+}
+
+.apollo-info-content {
+  padding: 0 24px 24px;
+  max-height: calc(60vh - 120px);
+  overflow-y: auto;
+}
+
+.apollo-description {
+  margin-bottom: 20px;
+}
+
+.apollo-description h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin-bottom: 8px;
+}
+
+.apollo-description p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--space-text-secondary);
+}
+
+.apollo-reference-points {
+  margin-bottom: 20px;
+}
+
+.apollo-reference-points h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin-bottom: 12px;
+}
+
+.reference-point {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: var(--space-surface);
+  border-radius: 8px;
+  border: 1px solid var(--space-border);
+}
+
+.reference-point-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+  margin-bottom: 4px;
+}
+
+.reference-point-description {
+  font-size: 0.85rem;
+  color: var(--space-text-secondary);
+  line-height: 1.4;
+}
+
+.apollo-reference {
+  margin-bottom: 16px;
+}
+
+.apollo-reference h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin-bottom: 8px;
+}
+
+.apollo-reference p {
+  font-size: 0.85rem;
+  color: var(--space-text-secondary);
+  margin-bottom: 8px;
+}
+
+.apollo-link {
+  color: var(--space-accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.apollo-link:hover {
+  color: var(--space-accent-hover);
+  text-decoration: underline;
+}
+
+/* Tour Instructions */
+.tour-instructions {
+  background: var(--space-surface);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  border: 1px solid var(--space-border);
+}
+
+.tour-instructions h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+  margin-bottom: 12px;
+}
+
+.tour-instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tour-instructions li {
+  font-size: 0.9rem;
+  color: var(--space-text-secondary);
+  margin-bottom: 8px;
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.tour-instructions li::before {
+  content: "•";
+  color: var(--space-accent);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
 /* Responsive Design for Moon Data Page */
 @media (max-width: 1200px) {
   .moon-data-content {
@@ -1903,10 +2458,34 @@ body {
 /* Responsive adjustments for feature info panel */
 @media (max-width: 768px) {
   .feature-info-panel-left {
-    width: 280px;
+    width: calc(100vw - 30px);
+    max-width: 350px;
     top: 15px;
     left: 15px;
     padding: 16px;
+    max-height: calc(100vh - 30px);
+  }
+  
+  .feature-official-info,
+  .feature-reference-info,
+  .feature-flag-info,
+  .feature-coordinates {
+    padding: 10px;
+  }
+  
+  .official-info-title,
+  .reference-info-title,
+  .flag-info-title,
+  .coordinates-title {
+    font-size: 0.8rem;
+  }
+  
+  .data-label {
+    font-size: 0.7rem;
+  }
+  
+  .data-value {
+    font-size: 0.8rem;
   }
 }
 
@@ -3100,6 +3679,281 @@ input:focus-visible {
   color: #00d4ff;
   font-weight: bold;
   font-size: 11px;
+}
+
+/* Moon Tour Map Page Styles */
+.tour-start-section {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.tour-start-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  background: linear-gradient(135deg, #4a9eff 0%, #5aaeff 100%);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  min-width: 200px;
+}
+
+.tour-start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #5aaeff 0%, #6abeff 100%);
+}
+
+.tour-start-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tour-start-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.tour-start-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.mission-overview {
+  background: var(--space-surface);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--space-border);
+  padding: 20px;
+}
+
+.mission-list-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.mission-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--space-glass);
+  border-radius: 8px;
+  border: 1px solid rgba(74, 158, 255, 0.1);
+}
+
+.mission-preview-number {
+  font-weight: 600;
+  color: var(--space-text-primary);
+}
+
+.mission-preview-year {
+  font-size: 0.9rem;
+  color: var(--space-text-muted);
+}
+
+.mission-preview-more {
+  text-align: center;
+  padding: 8px;
+  color: var(--space-text-muted);
+  font-style: italic;
+}
+
+/* Tour Information Panel */
+.tour-info-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 400px;
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--space-border);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.tour-info-header {
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid var(--space-border);
+}
+
+.tour-info-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tour-info-icon {
+  font-size: 1.5rem;
+}
+
+.tour-info-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--space-text-primary);
+}
+
+.tour-info-mission {
+  font-size: 0.9rem;
+  color: var(--space-accent);
+  font-weight: 500;
+}
+
+.tour-info-content {
+  padding: 20px;
+}
+
+.tour-info-description {
+  margin-bottom: 16px;
+}
+
+.tour-info-description p {
+  color: var(--space-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.tour-info-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tour-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--space-surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tour-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--space-accent) 0%, var(--space-accent-hover) 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.tour-progress-text {
+  font-size: 0.85rem;
+  color: var(--space-text-muted);
+  text-align: center;
+}
+
+/* Tour Mission Details */
+.tour-mission-details {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--space-surface);
+  border-radius: 8px;
+  border: 1px solid var(--space-border);
+}
+
+.mission-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mission-detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: var(--space-text-secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: var(--space-text-primary);
+  font-weight: 600;
+}
+
+/* Mission Historical and Scientific Info */
+.mission-historical-info,
+.mission-scientific-info {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mission-historical-info h5,
+.mission-scientific-info h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--space-accent);
+  margin: 0 0 8px 0;
+}
+
+.mission-historical-info p,
+.mission-scientific-info p {
+  font-size: 0.9rem;
+  color: var(--space-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+.tour-controls-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--space-glass);
+  backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--space-border);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  padding: 16px;
+}
+
+.tour-controls-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.tour-control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--space-surface);
+  border: 1px solid var(--space-border);
+  border-radius: 8px;
+  color: var(--space-text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.tour-control-btn:hover:not(:disabled) {
+  background: var(--space-surface-hover);
+  border-color: var(--space-accent);
+  color: var(--space-accent);
+}
+
+.tour-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Lunar Tour Start Button */

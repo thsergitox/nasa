@@ -1,0 +1,181 @@
+{
+    "Apollo_11": {
+        "mission": "Apollo 11",
+        "year": 1969,
+        "description": "Apollo 11 achieved humanity’s first crewed landing on the Moon, marking the beginning of human lunar exploration.",
+        "sites": [
+            {
+                "name": "Mare Tranquillitatis",
+                "description": "The Sea of Tranquility is a basaltic plain chosen for its flat terrain and visibility. It was the landing site of Apollo 11 on July 20, 1969.",
+                "importance": "Site of the first human lunar landing.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/3737"
+            },
+            {
+                "name": "Mount Marilyn",
+                "description": "A small lunar mountain used as a visual landmark by Apollo 11 astronauts during descent.",
+                "importance": "Helped the Apollo 11 crew navigate visually during approach.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/3779"
+            },
+            {
+                "name": "Statio Tranquillitatis",
+                "description": "Also known as 'Tranquility Base', it is the precise site where the Lunar Module Eagle landed.",
+                "importance": "Historic site of the first human step on another world.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/5871"
+            },
+            {
+                "name": "West Crater",
+                "description": "A small crater located just east of the Apollo 11 landing site.",
+                "importance": "Served as a major visual reference during final descent.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/6281"
+            }
+        ]
+    },
+    "Apollo_14": {
+        "mission": "Apollo 14",
+        "year": 1971,
+        "description": "Apollo 14 returned to the Moon to complete scientific objectives canceled by Apollo 13, focusing on the Fra Mauro formation.",
+        "sites": [
+            {
+                "name": "Fra Mauro",
+                "description": "An elevated hilly region formed by ejecta from the Imbrium impact basin.",
+                "importance": "Landing site of Apollo 14; samples provided insight into the Moon’s impact history.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/2004"
+            },
+            {
+                "name": "Fra Mauro A",
+                "description": "A smaller satellite crater near the main Fra Mauro formation.",
+                "importance": "Part of the Fra Mauro highlands, offering diverse rock samples.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/2005"
+            },
+            {
+                "name": "Fra Mauro B",
+                "description": "Another minor crater in the Fra Mauro area.",
+                "importance": "Associated with the landing region of Apollo 14.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/2006"
+            },
+            {
+                "name": "Fra Mauro C",
+                "description": "One of several small craters used for geological study during Apollo 14.",
+                "importance": "Represents ejecta distribution from the Imbrium impact.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/2007"
+            },
+            {
+                "name": "Fra Mauro J",
+                "description": "A small crater located within the Fra Mauro formation.",
+                "importance": "Used for crater-count dating in Apollo 14 imagery.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/2016"
+            },
+            {
+                "name": "Fra Mauro Z",
+                "description": "Peripheral crater marking the boundary of the Fra Mauro region.",
+                "importance": "Identified in post-mission mapping of Apollo 14.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/2037"
+            },
+            {
+                "name": "Mare Imbrium",
+                "description": "The Sea of Rains, one of the Moon’s largest impact basins.",
+                "importance": "Source of the Fra Mauro ejecta studied during Apollo 14.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/3693"
+            }
+        ]
+    },
+    "Apollo_15": {
+        "mission": "Apollo 15",
+        "year": 1971,
+        "description": "Apollo 15 was the first 'J-mission', emphasizing scientific exploration and extended surface operations.",
+        "sites": [
+            {
+                "name": "Mons Hadley",
+                "description": "A large mountain at the eastern edge of Mare Imbrium.",
+                "importance": "Explored by Apollo 15 astronauts; provided anorthosite samples from the lunar crust.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/3983"
+            },
+            {
+                "name": "Mons Hadley Delta",
+                "description": "A smaller mountain adjacent to Mons Hadley.",
+                "importance": "Climbed partially by Apollo 15 crew during surface traverses.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/3984"
+            },
+            {
+                "name": "Rima Hadley",
+                "description": "A sinuous rille extending south of Mons Hadley.",
+                "importance": "Studied as a volcanic channel; sampled by Apollo 15.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/5485"
+            },
+            {
+                "name": "Terrace",
+                "description": "A sloped geological formation near Hadley Rille.",
+                "importance": "Provided insight into layering of lunar basalt flows.",
+                "link": "https://www.hq.nasa.gov/alsj/a15/a15.htm"
+            }
+        ]
+    },
+    "Apollo_16": {
+        "mission": "Apollo 16",
+        "year": 1972,
+        "description": "Apollo 16 focused on the Descartes Highlands to determine the origin of lunar highland materials.",
+        "sites": [
+            {
+                "name": "Descartes",
+                "description": "A small crater giving its name to the landing region.",
+                "importance": "Apollo 16 landed in the Descartes Highlands to test volcanic vs. impact origin theories.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/1703"
+            },
+            {
+                "name": "Plum",
+                "description": "A boulder and small crater near the Apollo 16 landing site.",
+                "importance": "Famous for being photographed with astronaut John Young; offered pristine breccia samples.",
+                "link": "https://www.hq.nasa.gov/alsj/a16/a16.htm"
+            },
+            {
+                "name": "Smoky Mountains",
+                "description": "Lunar highland ridge northwest of the landing area.",
+                "importance": "Geological background for sampling impact-melt rocks and ancient highland material.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/5703"
+            }
+        ]
+    },
+    "Apollo_17": {
+        "mission": "Apollo 17",
+        "year": 1972,
+        "description": "Apollo 17, the final Apollo mission, combined mountainous and mare terrains at the Taurus-Littrow Valley.",
+        "sites": [
+            {
+                "name": "Bear Mountain",
+                "description": "A ridge north of the Apollo 17 landing area.",
+                "importance": "Used as a visual landmark during landing and traverse planning.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/1352"
+            },
+            {
+                "name": "Littrow",
+                "description": "A crater and nearby rilles in the Taurus region.",
+                "importance": "Central to the Apollo 17 geology traverses.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/3540"
+            },
+            {
+                "name": "Montes Taurus",
+                "description": "Mountain range bordering Mare Serenitatis and the Taurus-Littrow Valley.",
+                "importance": "Surrounds the Apollo 17 landing site; provided highland rock samples.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/4031"
+            },
+            {
+                "name": "Rimae Littrow",
+                "description": "A system of rilles near the Littrow crater.",
+                "importance": "Studied for evidence of tectonic and volcanic activity.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/5504"
+            },
+            {
+                "name": "Shakespeare",
+                "description": "A small crater within the Taurus-Littrow region.",
+                "importance": "Used as a secondary geological reference during Apollo 17.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/5675"
+            },
+            {
+                "name": "Taurus Littrow Valley",
+                "description": "The Apollo 17 landing site located between the Taurus Mountains and the Littrow crater complex.",
+                "importance": "Final human landing on the Moon; provided orange volcanic glass samples.",
+                "link": "https://planetarynames.wr.usgs.gov/Feature/6239"
+            }
+        ]
+    }
+}

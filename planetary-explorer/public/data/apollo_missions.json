@@ -1,0 +1,59 @@
+{
+  "missions": [
+    {
+      "name": "Apollo 11",
+      "features": [
+        { "name": "Mare Tranquillitatis", "path": "/data/apollo/apollo11/MareTranquillitatis_Poligono.geojson" },
+        { "name": "Mount Marilyn", "path": "/data/apollo/apollo11/MountMarilyn_Poligono.geojson" },
+        { "name": "Statio Tranquillitatis", "path": "/data/apollo/apollo11/StatioTranquillitatis_Poligono.geojson" },
+        { "name": "West", "path": "/data/apollo/apollo11/West_Poligono.geojson" }
+      ]
+    },
+    {
+      "name": "Apollo 14",
+      "features": [
+        { "name": "Fra Mauro A", "path": "/data/apollo/apollo14/FraMauroA_Poligono.geojson" },
+        { "name": "Fra Mauro B", "path": "/data/apollo/apollo14/FraMauroB_Poligono.geojson" },
+        { "name": "Fra Mauro C", "path": "/data/apollo/apollo14/FraMauroC_Poligono.geojson" },
+        { "name": "Fra Mauro J", "path": "/data/apollo/apollo14/FraMauroJ_Poligono.geojson" },
+        { "name": "Fra Mauro Z", "path": "/data/apollo/apollo14/FraMauroZ_Poligono.geojson" },
+        { "name": "Fra Mauro", "path": "/data/apollo/apollo14/FraMauro_Poligono.geojson" },
+        { "name": "Mare Imbrium", "path": "/data/apollo/apollo14/MareImbrium_Poligono.geojson" }
+      ]
+    },
+    {
+      "name": "Apollo 15",
+      "features": [
+        { "name": "Mons Hadley Delta", "path": "/data/apollo/apollo15/MonsHadleyDelta_Poligono.geojson" },
+        { "name": "Mons Hadley", "path": "/data/apollo/apollo15/MonsHadley_Poligono.geojson" },
+        { "name": "Rima Hadley", "path": "/data/apollo/apollo15/RimaHadley_Poligono.geojson" },
+        { "name": "Terrace", "path": "/data/apollo/apollo15/Terrace_Poligono.geojson" }
+      ]
+    },
+    {
+      "name": "Apollo 16",
+      "features": [
+        { "name": "Descartes", "path": "/data/apollo/apollo16/Descartes_Poligono.geojson" },
+        { "name": "Plum", "path": "/data/apollo/apollo16/Plum_Poligono.geojson" },
+        { "name": "Smoky Mountains", "path": "/data/apollo/apollo16/SmokyMountains_Poligono.geojson" }
+      ]
+    },
+    {
+      "name": "Apollo 17",
+      "features": [
+        { "name": "Bear Mountain", "path": "/data/apollo/apollo17/BearMountain_Poligono.geojson" },
+        { "name": "Littrow", "path": "/data/apollo/apollo17/Littrow_Poligono.geojson" },
+        { "name": "Montes Taurus", "path": "/data/apollo/apollo17/MontesTaurus_Poligono.geojson" },
+        { "name": "Rimae Littrow", "path": "/data/apollo/apollo17/RimaeLittrow_Poligono.geojson" },
+        { "name": "Shakespeare", "path": "/data/apollo/apollo17/Shakespeare_Poligono.geojson" },
+        { "name": "Taurus-Littrow Valley", "path": "/data/apollo/apollo17/TaurusLittrowValley_Poligono.geojson" }
+      ],
+      "tours": [
+        {
+          "name": "EVA 3",
+          "path": "/data/tours/luna_apollo_17_eva3.geojson"
+        }
+      ]
+    }
+  ]
+}

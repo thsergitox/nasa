@@ -90,6 +90,244 @@
             "lon_east_0_360": 30.7867,
             "lon_westneg_180": 30.786699999999996
         }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                23.4732,
+                0.6741
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Statio Tranquillitatis",
+            "feature_type": "Statio",
+            "lat": 0.6741,
+            "lon_east_0_360": 23.4732
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                40,
+                1.13
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mount Marilyn",
+            "feature_type": "Astronaut-named features",
+            "lat": 1.13,
+            "lon_east_0_360": 40
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                23.4908,
+                0.6705
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "West",
+            "feature_type": "Astronaut-named features",
+            "lat": 0.6705,
+            "lon_east_0_360": 23.4908
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                -14.9086,
+                34.7244
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mare Imbrium",
+            "feature_type": "Mare, maria",
+            "lat": 34.7244,
+            "lon_east_0_360": 345.0914
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                3.7065,
+                25.723
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mons Hadley Delta",
+            "feature_type": "Mons, montes",
+            "lat": 25.723,
+            "lon_east_0_360": 3.7065
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                4.1183,
+                26.6948
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Mons Hadley",
+            "feature_type": "Mons, montes",
+            "lat": 26.6948,
+            "lon_east_0_360": 4.1183
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                3.562,
+                26.1452
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Terrace",
+            "feature_type": "Astronaut-named features",
+            "lat": 26.1452,
+            "lon_east_0_360": 3.562
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                15.4521,
+                -8.9764
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Plum",
+            "feature_type": "Astronaut-named features",
+            "lat": -8.9764,
+            "lon_east_0_360": 15.4521
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                15.5086,
+                -8.67
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Smoky Mountains",
+            "feature_type": "Astronaut-named features",
+            "lat": -8.67,
+            "lon_east_0_360": 15.5086
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.7729,
+                19.9803
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Bear Mountain",
+            "feature_type": "Astronaut-named features",
+            "lat": 19.9803,
+            "lon_east_0_360": 30.7729
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                31.3941,
+                21.5037
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Littrow",
+            "feature_type": "Crater, craters",
+            "lat": 21.5037,
+            "lon_east_0_360": 31.3941
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                40.3355,
+                27.3232
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Montes Taurus",
+            "feature_type": "Mons, montes",
+            "lat": 27.3232,
+            "lon_east_0_360": 40.3355
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.4736,
+                22.4678
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Rimae Littrow",
+            "feature_type": "Rima, rimae",
+            "lat": 22.4678,
+            "lon_east_0_360": 30.4736
+        }
+    },
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                30.8158,
+                20.2434
+            ]
+        },
+        "properties": {
+            "body": "Moon",
+            "name": "Shakespeare",
+            "feature_type": "Astronaut-named features",
+            "lat": 20.2434,
+            "lon_east_0_360": 30.8158
+        }
     }
     ]
 }

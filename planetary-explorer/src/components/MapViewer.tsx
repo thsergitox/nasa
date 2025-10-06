@@ -6,8 +6,11 @@ import {
   type GazetteerFeature, 
   loadGazetteerData, 
   convertLonTo180,
-  searchFeaturesByName 
+  searchFeaturesByName,
+  getPolygonPath,
+  type ApolloTour
 } from '../services/gazetteer.service';
+import { type TourStep } from '../services/apollo-tour.service';
 
 // Interface para características geológicas
 interface GeologicalFeature {
@@ -23,10 +26,18 @@ interface GeologicalFeature {
 interface MapViewerProps {
   currentBody: CelestialBody;
   is3DMode: boolean;
-  currentPage: 'main' | 'feature-detail' | 'moon-data';
+  currentPage: 'main' | 'feature-detail' | 'moon-data' | 'apollo-sites' | 'moon-tour';
   selectedFeature: GeologicalFeature | null;
   onNavigateToMoonData: () => void;
   onNavigateToMain: () => void;
+  onNavigateToApolloSites: () => void;
+  onNavigateToMoonTour?: () => void;
+  selectedTour: ApolloTour | null;
+  featuresToShow: GazetteerFeature[];
+  tourSteps?: TourStep[];
+  currentStepIndex?: number;
+  isPlaying?: boolean;
+  onTourStepComplete?: () => void;
 }
 
 const MapViewer: React.FC<MapViewerProps> = ({ 
@@ -35,7 +46,11 @@ const MapViewer: React.FC<MapViewerProps> = ({
   currentPage, 
   selectedFeature, 
   onNavigateToMoonData,
-  onNavigateToMain
+  onNavigateToApolloSites,
+  onNavigateToMoonTour,
+  selectedTour,
+  featuresToShow,
+
 }) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
@@ -47,99 +62,191 @@ const MapViewer: React.FC<MapViewerProps> = ({
   const [showAllPoints, setShowAllPoints] = useState(true);
   const [visiblePoints, setVisiblePoints] = useState<GazetteerFeature[]>([]);
   const [hoveredFeature, setHoveredFeature] = useState<GazetteerFeature | null>(null);
-  const [showDataSubmenu, setShowDataSubmenu] = useState(false);
   const [dataSearchTerm, setDataSearchTerm] = useState('');
-  const [selectedDataCategory, setSelectedDataCategory] = useState<string>('');
-  const [categoryResults, setCategoryResults] = useState<GazetteerFeature[]>([]);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [currentCameraPosition, setCurrentCameraPosition] = useState<{lat: number, lon: number} | null>(null);
   const [cameraHeight, setCameraHeight] = useState<number>(0);
-  const [showLunarTour, setShowLunarTour] = useState(false);
+  const [polygonDataSources, setPolygonDataSources] = useState<Map<string, Cesium.GeoJsonDataSource>>(new Map());
+  const [tourDataSource, setTourDataSource] = useState<Cesium.GeoJsonDataSource | null>(null);
+  const [polygonLabels, setPolygonLabels] = useState<Map<string, Cesium.Entity>>(new Map());
 
 
-  // Função para aplicar filtros inteligentes
-  const applySmartFilters = (filters: string[]) => {
-    if (filters.length === 0) {
-      setCategoryResults([]);
-      return;
-    }
+  // Cargar polígonos de features seleccionadas
+  useEffect(() => {
+    if (!viewerRef.current) return;
+    const viewer = viewerRef.current;
 
-    console.log('Aplicando filtros:', filters);
-    console.log('Total de features no gazetteer:', gazetteerData.length);
-
-    const filteredFeatures = gazetteerData.filter(feature => {
-      const featureName = feature.properties.name?.toLowerCase() || '';
-      const featureType = feature.properties.feature_type?.toLowerCase() || '';
-      
-      // Se múltiplos filtros estão selecionados, usar OR logic
-      return filters.some(filterKey => {
-        switch (filterKey) {
-          case 'craters':
-            // Lógica mais robusta para crateras
-            const isCrater = featureName.includes('crater') || featureType.includes('crater') || 
-                            featureName.includes('impact') || featureType.includes('impact');
-            
-            // Para Lua: Descartes e Fra Mauro são crateras conhecidas
-            const isLunarCrater = currentBody === 'moon' && 
-                                 (featureName.includes('descartes') || featureName.includes('fra mauro'));
-            
-            // Para Marte: verificar se é uma cratera conhecida
-            const isMartianCrater = currentBody === 'mars' && (
-              featureName.includes('airy') || featureName.includes('gale') || 
-              featureName.includes('jezero') || featureName.includes('endeavour') ||
-              featureName.includes('gusev') || featureName.includes('meridiani')
-            );
-            
-            return isCrater || isLunarCrater || isMartianCrater;
-          case 'volcanoes':
-            return featureName.includes('volcano') || featureType.includes('volcano') ||
-                   featureName.includes('patera') || featureType.includes('patera');
-          case 'mountains':
-            return featureName.includes('mountain') || featureType.includes('mountain') ||
-                   featureName.includes('mons') || featureType.includes('mons') ||
-                   featureName.includes('montes') || featureType.includes('montes');
-          case 'canyons':
-            return featureName.includes('canyon') || featureType.includes('canyon') ||
-                   featureName.includes('valley') || featureType.includes('valley') ||
-                   featureName.includes('vallis') || featureType.includes('vallis') ||
-                   featureName.includes('valles') || featureType.includes('valles');
-          case 'maria':
-            return featureName.includes('mare') || featureType.includes('mare') ||
-                   featureName.includes('sea') || featureType.includes('sea');
-          case 'rilles':
-            return featureName.includes('rille') || featureType.includes('rille') ||
-                   featureName.includes('rima') || featureType.includes('rima');
-          case 'polar':
-            return featureName.includes('polar') || featureType.includes('polar') ||
-                   featureName.includes('planum') || featureType.includes('planum') ||
-                   featureName.includes('boreum') || featureType.includes('boreum');
-          default:
-            return false;
+    // Función para limpiar todos los dataSources
+    const cleanupDataSources = () => {
+      // Limpiar polígonos anteriores
+      polygonDataSources.forEach(dataSource => {
+        try {
+          viewer.dataSources.remove(dataSource, true);
+        } catch (e) {
+          console.error('Error removing dataSource:', e);
         }
       });
-    });
-    
-    console.log('Features filtradas:', filteredFeatures.length);
-    if (filteredFeatures.length > 0) {
-      console.log('Primeiras features encontradas:', filteredFeatures.slice(0, 3).map(f => f.properties.name));
-    } else {
-      console.log('Nenhuma feature encontrada. Verificando dados disponíveis...');
-      console.log('Primeiras 5 features do gazetteer:', gazetteerData.slice(0, 5).map(f => f.properties.name));
+      // Limpiar etiquetas de polígonos
+      polygonLabels.forEach(label => {
+        try {
+          viewer.entities.remove(label);
+        } catch (e) {
+          console.error('Error removing label:', e);
+        }
+      });
+      setPolygonLabels(new Map());
+      // Limpiar tour anterior si existe
+      if (tourDataSource) {
+        try {
+          viewer.dataSources.remove(tourDataSource, true);
+        } catch (e) {
+          console.error('Error removing tour dataSource:', e);
+        }
+        setTourDataSource(null);
+      }
+    };
+
+    cleanupDataSources();
+    setPolygonDataSources(new Map());
+
+    if (featuresToShow.length > 0) {
+      const newSources = new Map<string, Cesium.GeoJsonDataSource>();
+      const newLabels = new Map<string, Cesium.Entity>();
+      const promises = featuresToShow.map(async feature => {
+        if (feature.properties.has_polygon) {
+          const path = await getPolygonPath(feature.properties.name);
+          if (path) {
+            try {
+              const dataSource = await Cesium.GeoJsonDataSource.load(path, {
+                stroke: Cesium.Color.YELLOW,
+                fill: Cesium.Color.YELLOW.withAlpha(0.3),
+                strokeWidth: 3,
+              });
+              viewer.dataSources.add(dataSource);
+              newSources.set(feature.properties.name, dataSource);
+              
+              // Agregar etiqueta para el polígono
+              const entities = dataSource.entities.values;
+              if (entities.length > 0) {
+                const polygon = entities[0];
+                if (polygon.polygon) {
+                  // Calcular el centro del polígono
+                  const positions = polygon.polygon.hierarchy.getValue().positions;
+                  const center = Cesium.BoundingSphere.fromPoints(positions).center;
+                  const cartographic = Cesium.Cartographic.fromCartesian(center);
+                  
+                  const label = viewer.entities.add({
+                    position: Cesium.Cartesian3.fromRadians(
+                      cartographic.longitude,
+                      cartographic.latitude,
+                      cartographic.height
+                    ),
+                    label: {
+                      text: feature.properties.name,
+                      font: '16pt sans-serif',
+                      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                      fillColor: Cesium.Color.WHITE,
+                      outlineColor: Cesium.Color.BLACK,
+                      outlineWidth: 3,
+                      pixelOffset: new Cesium.Cartesian2(0, 0),
+                      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                      show: true
+                    }
+                  });
+                  newLabels.set(feature.properties.name, label);
+                }
+              }
+            } catch (e) {
+              console.error('Error loading polygon:', path, e);
+            }
+          }
+        }
+      });
+
+      Promise.all(promises).then(() => {
+        setPolygonDataSources(newSources);
+        setPolygonLabels(newLabels);
+        if (newSources.size > 0) {
+          const entities = Array.from(newSources.values()).flatMap(ds => ds.entities.values);
+          viewer.flyTo(entities, {
+            duration: 2.0,
+            offset: new Cesium.HeadingPitchRange(0, -Math.PI / 4, 0)
+          });
+        }
+      });
     }
-    
-    setCategoryResults(filteredFeatures);
-  };
+  }, [featuresToShow]);
+
+  // Cargar tour seleccionado
+  useEffect(() => {
+    if (!viewerRef.current) return;
+    const viewer = viewerRef.current;
+
+    // Función para limpiar todos los dataSources
+    const cleanupAllDataSources = () => {
+      // Limpiar polígonos anteriores
+      polygonDataSources.forEach(dataSource => {
+        try {
+          viewer.dataSources.remove(dataSource, true);
+        } catch (e) {
+          console.error('Error removing polygon dataSource:', e);
+        }
+      });
+      setPolygonDataSources(new Map());
+      
+      // Limpiar etiquetas anteriores
+      polygonLabels.forEach(label => {
+        try {
+          viewer.entities.remove(label);
+        } catch (e) {
+          console.error('Error removing label:', e);
+        }
+      });
+      setPolygonLabels(new Map());
+      
+      // Limpiar tour anterior
+      if (tourDataSource) {
+        try {
+          viewer.dataSources.remove(tourDataSource, true);
+        } catch (e) {
+          console.error('Error removing tour dataSource:', e);
+        }
+        setTourDataSource(null);
+      }
+    };
+
+    if (selectedTour) {
+      // Limpiar todo antes de cargar el nuevo tour
+      cleanupAllDataSources();
+      
+      Cesium.GeoJsonDataSource.load(selectedTour.path, {
+        stroke: Cesium.Color.CYAN,
+        strokeWidth: 5,
+      }).then(dataSource => {
+        viewer.dataSources.add(dataSource);
+        setTourDataSource(dataSource);
+        viewer.flyTo(dataSource, {
+          duration: 2.0,
+          offset: new Cesium.HeadingPitchRange(0, -Math.PI / 4, 0)
+        });
+      }).catch(error => {
+        console.error('Error loading tour:', selectedTour.path, error);
+      });
+    }
+  }, [selectedTour]);
+
+
+
+
 
   // Função para lidar com clique em uma feature específica
-  const handleFeatureClick = (feature: GazetteerFeature) => {
+  const handleFeatureClick = async (feature: GazetteerFeature) => {
     // Navegar para a feature selecionada
     flyToLocation(feature);
     
     // Atualizar estados do Search Locations
     setSearchResults([feature]);
-    setVisiblePoints([feature]);
-    setShowAllPoints(false);
-    setSearchTerm(feature.properties.name || '');
+    // No es necesario cambiar los polígonos visibles aquí, se maneja desde App.tsx
   };
 
   // Função para filtrar opções de dados baseada na busca
@@ -588,13 +695,13 @@ const MapViewer: React.FC<MapViewerProps> = ({
     setShowSearch(false);
     setSelectedGazetteerFeature(feature);
 
-    // Volar al punto
+    // Siempre volar a la ubicación, independientemente de si tiene polígono
     viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(position.lon180, position.lat, 500000),
       duration: 2.0,
       orientation: {
         heading: 0,
-        pitch: Cesium.Math.toRadians(-90),
+        pitch: Cesium.Math.toRadians(-45),
         roll: 0
       }
     });
@@ -604,7 +711,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
   useEffect(() => {
     // Esta função será chamada quando uma feature for selecionada externamente
     const handleExternalFeatureSelect = (feature: GazetteerFeature) => {
-      flyToLocation(feature);
+      handleFeatureClick(feature);
     };
     
     // Expor a função globalmente para uso externo
@@ -635,8 +742,8 @@ const MapViewer: React.FC<MapViewerProps> = ({
       >
         <ImageryLayer imageryProvider={provider} />
         
-        {/* Mostrar pontos do gazetteer */}
-        {visiblePoints.map((feature, index) => {
+        {/* Mostrar pontos do gazetteer - solo en ciertas páginas */}
+        {(currentPage === 'main' || currentPage === 'moon-data') && showAllPoints && visiblePoints.map((feature, index) => {
           const position = getFeaturePosition(feature);
           if (!position) {
             return null;
@@ -659,7 +766,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
               onMouseLeave={() => setHoveredFeature(null)}
               onClick={() => {
                 setSelectedGazetteerFeature(feature);
-                flyToLocation(feature);
+                handleFeatureClick(feature);
               }}
             />
           );
@@ -693,6 +800,29 @@ const MapViewer: React.FC<MapViewerProps> = ({
           );
         })()}
       </Viewer>
+
+      {/* Botón de centrar vista - Siempre visible */}
+      <button 
+        className="center-view-button"
+        onClick={() => {
+          if (viewerRef.current) {
+            viewerRef.current.camera.flyTo({
+              destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000),
+              duration: 2.0,
+              orientation: {
+                heading: 0,
+                pitch: Cesium.Math.toRadians(-90),
+                roll: 0
+              }
+            });
+          }
+        }}
+        title="Center Moon View"
+      >
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm-7 7H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm10 6h4c1.1 0 2-.9 2-2v-4h-2v4h-4v2zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+      </button>
 
       {/* System Menu - Only show on main page */}
       {currentPage === 'main' && (
@@ -733,7 +863,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
           </button>
           <button 
             className="menu-item"
-            onClick={() => setShowLunarTour(!showLunarTour)}
+            onClick={onNavigateToApolloSites}
           >
             <div className="menu-item-icon">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -741,7 +871,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
               </svg>
             </div>
             <div className="menu-item-content">
-            <span className="menu-text">Moon Tour</span>
+            <span className="menu-text">Visit Apollo Landing Sites</span>
               <span className="menu-description">Apollo missions</span>
                         </div>
           </button>
@@ -813,7 +943,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
               return (
                 <button
                   key={index}
-                  onClick={() => flyToLocation(feature)}
+                  onClick={() => handleFeatureClick(feature)}
                   className="search-result-item"
                 >
                   <div className="result-name">{feature.properties.name}</div>
@@ -933,28 +1063,6 @@ const MapViewer: React.FC<MapViewerProps> = ({
         </div>
       )}
 
-      {/* Lunar Tour Start Button */}
-      {currentPage === 'main' && showLunarTour && (
-        <div className="lunar-tour-start">
-          <button 
-            className="tour-start-button"
-            onClick={() => {
-              // Aqui implementaremos a lógica para iniciar o tour
-              console.log('Iniciando tour lunar das missões Apollo');
-            }}
-          >
-            <div className="tour-start-content">
-              <span className="tour-start-text">Inicio</span>
-              <div className="tour-start-icon">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
-            </div>
-          </button>
-        </div>
-      )}
-
       {/* Cesium Viewer */}
       <div className="cesium-container">
         <Viewer
@@ -975,8 +1083,8 @@ const MapViewer: React.FC<MapViewerProps> = ({
         >
         <ImageryLayer imageryProvider={provider} />
         
-        {/* Mostrar todos los puntos del gazetteer */}
-        {showAllPoints && visiblePoints.map((feature, index) => {
+        {/* Mostrar todos los puntos del gazetteer - solo en la página principal */}
+        {showAllPoints && currentPage === 'main' && visiblePoints.map((feature, index) => {
           const position = getFeaturePosition(feature);
           if (!position) {
             return null;
@@ -999,7 +1107,7 @@ const MapViewer: React.FC<MapViewerProps> = ({
               onMouseLeave={() => setHoveredFeature(null)}
               onClick={() => {
                 setSelectedGazetteerFeature(feature);
-                flyToLocation(feature);
+                handleFeatureClick(feature);
               }}
             />
           );
