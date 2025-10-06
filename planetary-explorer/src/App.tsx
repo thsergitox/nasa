@@ -48,7 +48,7 @@ const App: React.FC = () => {
   // Nuevos estados para manejar la visualización en el mapa
   const [featuresToShow, setFeaturesToShow] = useState<GazetteerFeature[]>([]);
   
-  // Estados para Moon Tour (como tu compañera)
+  // Estados para Moon Tour
   const [currentTourStep, setCurrentTourStep] = useState<number>(0);
   const [isTourPlaying, setIsTourPlaying] = useState<boolean>(false);
   const [selectedApolloMission, setSelectedApolloMission] = useState<any>(null);
@@ -81,7 +81,7 @@ const App: React.FC = () => {
     }
   }, [currentPage, currentBody]);
 
-  // Carregar dados das miss\u00f5es Apollo quando a p\u00e1gina Moon Tour for acessada
+  // Carregar dados das missões Apollo quando a página Moon Tour for acessada
   useEffect(() => {
     if (currentPage === 'moon-tour' || currentPage === 'moon-tour-map') {
       console.log('Loading Apollo missions data');
@@ -250,6 +250,86 @@ const App: React.FC = () => {
         }
       },
       'moon': {
+        'Mare Tranquillitatis': {
+          description: 'Sea of Tranquility',
+          detailedDescription: 'Lunar sea where Apollo 11 landed in 1969. Formed by basaltic lava that filled a giant impact basin.',
+          featureType: 'Mare, maria',
+          approvalDate: '1935',
+          ethnicity: 'Latin',
+          origin: '"Sea of Tranquility."',
+          reference: '[66] - Named Lunar Formations, by Mary A. Blagg and K. Müller: Percy Lund, Humphries and Co. Ltd., London, 1935.',
+          url: 'https://planetarynames.wr.usgs.gov/Feature/3691',
+          flag: 'On February 20, 1965, the Ranger 8 spacecraft was deliberately crashed into the Mare Tranquillitatis at 2.6377°N 24.7881°E after successfully transmitting 7,137 close-range photographs of the Moon in the final 23 minutes of its mission.',
+          data: [
+            { label: 'Diameter', value: '873 km' },
+            { label: 'Depth', value: '1.8 km' },
+            { label: 'Age', value: '3.8 billion years' }
+          ]
+        },
+        'Rima Hadley': {
+          description: 'Lunar rille near Apollo 15 landing site',
+          detailedDescription: 'A sinuous channel about 80 km long formed by lava flows — a clear example of ancient volcanic activity on the Moon.',
+          featureType: 'Rima, rimae',
+          approvalDate: '1964',
+          ethnicity: 'Great Britain',
+          origin: 'Named from nearby Mountain (Mons Hadley).',
+          reference: '[67] - The System of Lunar Craters, Quadrants I, II, III, IV: by D. W. G. Arthur and others: Communications of the Lunar and Planetary Laboratory, vol. 2, no. 30, 1963: vol. 3, no. 40, 1964: vol. 3, no. 50, 1965: vol. 5, no. 70, 1966.',
+          url: 'https://planetarynames.wr.usgs.gov/Feature/5064',
+          flag: 'Rima Hadley typically ranges in depth between 600 and 900 feet (180 and 270 m), but is approximately 1,200 feet (370 m) deep at the Apollo 15 landing site',
+          data: [
+            { label: 'Length', value: '80 km' },
+            { label: 'Depth', value: '180-370 m' },
+            { label: 'Type', value: 'Sinuous rille' }
+          ]
+        },
+        'Descartes': {
+          description: 'Lunar crater near Apollo 16 landing site',
+          detailedDescription: 'About 50 kilometers to the north of this crater was the landing site of Apollo 16. The uneven region about the landing area is sometimes called the Descartes Highlands or the Descartes Mountains.',
+          featureType: 'Crater, craters',
+          approvalDate: '1935',
+          ethnicity: 'France',
+          origin: 'René; French mathematician, philosopher (1596-1650).',
+          reference: '[68] - World Who\'s Who in Science, edited by Allen G. Debus: Western Publishing Company, Hannibal, Mo., 1968: New York, 1973.',
+          url: 'https://planetarynames.wr.usgs.gov/Feature/1498',
+          flag: 'About 50 kilometers to the north of this crater was the landing site of Apollo 16. The uneven region about the landing area is sometimes called the Descartes Highlands or the Descartes Mountains.',
+          data: [
+            { label: 'Diameter', value: '48 km' },
+            { label: 'Depth', value: '1.5 km' },
+            { label: 'Age', value: '3.2 billion years' }
+          ]
+        },
+        'Fra Mauro': {
+          description: 'Lunar crater near Apollo 14 landing site',
+          detailedDescription: 'The area north of Fra Mauro crater was the intended landing site of the ill-fated Apollo 13 mission, which was aborted after an oxygen tank aboard the spacecraft exploded.',
+          featureType: 'Crater, craters',
+          approvalDate: '1935',
+          ethnicity: 'Italian',
+          origin: 'Italian geographer (unkn-1459).',
+          reference: '[66] - Named Lunar Formations, by Mary A. Blagg and K. Müller: Percy Lund, Humphries and Co. Ltd., London, 1935.',
+          url: 'https://planetarynames.wr.usgs.gov/Feature/2007',
+          flag: 'The area north of Fra Mauro crater was the intended landing site of the ill-fated Apollo 13 mission, which was aborted after an oxygen tank aboard the spacecraft exploded.',
+          data: [
+            { label: 'Diameter', value: '95 km' },
+            { label: 'Depth', value: '0.8 km' },
+            { label: 'Age', value: '3.9 billion years' }
+          ]
+        },
+        'Taurus-Littrow Valley': {
+          description: 'Apollo 17 landing site valley',
+          detailedDescription: 'It served as the landing site for the American Apollo 17 mission in December 1972, the last crewed mission to the Moon.',
+          featureType: 'Astronaut-named features',
+          approvalDate: '1973',
+          ethnicity: 'American',
+          origin: 'Astronaut-named feature, Apollo 17 site.',
+          reference: '[59] - The New Encyclopaedia Britannica: Encyclopaedia Britannica Inc., Chicago, 1974, 1993.',
+          url: 'https://planetarynames.wr.usgs.gov/Feature/5881',
+          flag: 'It served as the landing site for the American Apollo 17 mission in December 1972, the last crewed mission to the Moon.',
+          data: [
+            { label: 'Length', value: '35 km' },
+            { label: 'Width', value: '15 km' },
+            { label: 'Mission', value: 'Apollo 17' }
+          ]
+        },
         'Tycho Crater': {
           description: 'Prominent lunar impact crater',
           detailedDescription: 'Impact crater formed millions of years ago. Its circular structure and elevated edges are typical characteristics of the oldest lunar craters.',
@@ -266,15 +346,6 @@ const App: React.FC = () => {
             { label: 'Diameter', value: '96 km' },
             { label: 'Depth', value: '3.8 km' },
             { label: 'Age', value: '800 million years' }
-          ]
-        },
-        'Mare Tranquillitatis': {
-          description: 'Sea of Tranquility',
-          detailedDescription: 'Lunar sea where Apollo 11 landed in 1969. Formed by basaltic lava that filled a giant impact basin.',
-          data: [
-            { label: 'Diameter', value: '873 km' },
-            { label: 'Depth', value: '1.8 km' },
-            { label: 'Age', value: '3.8 billion years' }
           ]
         }
       },
@@ -321,7 +392,7 @@ const App: React.FC = () => {
       <header className="header">
         <div className="header-left">
           
-          {(currentPage === 'feature-detail' || currentPage === 'moon-data' || currentPage === 'apollo-sites' || currentPage === 'moon-tour') && (
+          {(currentPage === 'feature-detail' || currentPage === 'moon-data' || currentPage === 'apollo-sites' || currentPage === 'moon-tour' || currentPage === 'moon-tour-map') && (
             <button
               className="action-button"
               onClick={navigateBack}
@@ -360,9 +431,26 @@ const App: React.FC = () => {
               <span>Moon Tour</span>
             </div>
           )}
+          {currentPage === 'moon-tour-map' && (
+            <div className="page-title">
+              <span className="page-icon">🌙</span>
+              <span>Moon Tour</span>
+            </div>
+          )}
         </div>
 
         <div className="header-right">
+          <button
+            className="action-button"
+            onClick={() => setCurrentPage('main')}
+            title="Home"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+            <span>Home</span>
+          </button>
+          
           <div className="view-toggle">
             <button 
               className={`toggle-btn ${is3DMode ? 'active' : ''}`}
@@ -377,25 +465,12 @@ const App: React.FC = () => {
               2D
             </button>
           </div>
-          
-          {(currentPage === 'feature-detail' || currentPage === 'moon-data' || currentPage === 'apollo-sites' || currentPage === 'moon-tour') && (
-            <button
-              className="action-button"
-              onClick={() => setCurrentPage('main')}
-              title="Menu"
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-              </svg>
-              <span>Menu</span>
-            </button>
-          )}
             <button
               className={`action-button ${showHelp ? 'active' : ''}`}
               onClick={() => setShowHelp(!showHelp)}
               title="Help & Info"
             >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
             </svg>
             <span>Help</span>
@@ -415,12 +490,14 @@ const App: React.FC = () => {
                   is3DMode={is3DMode}
                   currentPage={currentPage}
                   selectedFeature={selectedFeature}
+                  selectedGazetteerFeature={selectedGazetteerFeature}
                   onNavigateToMoonData={() => setCurrentPage('moon-data')}
                   onNavigateToMain={() => setCurrentPage('main')}
                   onNavigateToApolloSites={navigateToApolloSites}
                   onNavigateToMoonTour={navigateToMoonTour}
                   featuresToShow={featuresToShow}
                   selectedTour={selectedTour}
+                  onFeatureSelect={setSelectedGazetteerFeature}
                 />
               </div>
 
@@ -443,9 +520,6 @@ const App: React.FC = () => {
                     </button>
                   </div>
                   
-                  <div className="feature-info-subtitle">
-                    Gazetteer location on moon
-                  </div>
                   
                   <div className="feature-info-content">
                     {(() => {
@@ -460,6 +534,7 @@ const App: React.FC = () => {
                               <p>{featureDetails.detailedDescription}</p>
                             </div>
                             
+                            {/* Informações Geológicas */}
                             <div className="feature-data">
                               {featureDetails.data.map((item: any, index: number) => (
                                 <div key={index} className="data-item">
@@ -467,7 +542,71 @@ const App: React.FC = () => {
                                   <span className="data-value">{item.value}</span>
                                 </div>
                               ))}
-                              
+                            </div>
+
+                            {/* Informações Oficiais do Gazetteer */}
+                            {(featureDetails.featureType || featureDetails.approvalDate || featureDetails.ethnicity || featureDetails.origin) && (
+                              <div className="feature-official-info">
+                                <h4 className="official-info-title">Official Information</h4>
+                                {featureDetails.featureType && (
+                                  <div className="data-item">
+                                    <span className="data-label">Feature Type:</span>
+                                    <span className="data-value">{featureDetails.featureType}</span>
+                                  </div>
+                                )}
+                                {featureDetails.approvalDate && (
+                                  <div className="data-item">
+                                    <span className="data-label">Approval Date:</span>
+                                    <span className="data-value">{featureDetails.approvalDate}</span>
+                                  </div>
+                                )}
+                                {featureDetails.ethnicity && (
+                                  <div className="data-item">
+                                    <span className="data-label">Ethnicity:</span>
+                                    <span className="data-value">{featureDetails.ethnicity}</span>
+                                  </div>
+                                )}
+                                {featureDetails.origin && (
+                                  <div className="data-item">
+                                    <span className="data-label">Origin:</span>
+                                    <span className="data-value">{featureDetails.origin}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Referência e URL */}
+                            {(featureDetails.reference || featureDetails.url) && (
+                              <div className="feature-reference-info">
+                                <h4 className="reference-info-title">Reference</h4>
+                                {featureDetails.reference && (
+                                  <div className="reference-item">
+                                    <span className="reference-text">{featureDetails.reference}</span>
+                                  </div>
+                                )}
+                                {featureDetails.url && (
+                                  <div className="reference-url">
+                                    <a href={featureDetails.url} target="_blank" rel="noopener noreferrer" className="reference-link">
+                                      View on USGS Gazetteer →
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Informação Histórica/Flag */}
+                            {featureDetails.flag && (
+                              <div className="feature-flag-info">
+                                <h4 className="flag-info-title">Historical Note</h4>
+                                <div className="flag-content">
+                                  <p>{featureDetails.flag}</p>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Coordenadas */}
+                            <div className="feature-coordinates">
+                              <h4 className="coordinates-title">Coordinates</h4>
                               <div className="data-item">
                                 <span className="data-label">Latitude:</span>
                                 <span className="data-value">{selectedGazetteerFeature.properties.lat.toFixed(4)}°</span>
@@ -479,13 +618,13 @@ const App: React.FC = () => {
                                     ? selectedGazetteerFeature.properties.lon_east_0_360.toFixed(4) + '°'
                                     : selectedGazetteerFeature.properties.lon_westneg_180 
                                     ? selectedGazetteerFeature.properties.lon_westneg_180.toFixed(4) + '°'
-                                    : 'N/A'
+                                    : 'Data not available'
                                   }
                                 </span>
                               </div>
                               {selectedGazetteerFeature.properties.feature_type && (
                                 <div className="data-item">
-                                  <span className="data-label">Type:</span>
+                                  <span className="data-label">Gazetteer Type:</span>
                                   <span className="data-value">{selectedGazetteerFeature.properties.feature_type}</span>
                                 </div>
                               )}
@@ -499,7 +638,8 @@ const App: React.FC = () => {
                               <p>Gazetteer location on {currentBody}</p>
                             </div>
                             
-                            <div className="feature-data">
+                            <div className="feature-coordinates">
+                              <h4 className="coordinates-title">Coordinates</h4>
                               <div className="data-item">
                                 <span className="data-label">Latitude:</span>
                                 <span className="data-value">{selectedGazetteerFeature.properties.lat.toFixed(4)}°</span>
@@ -511,13 +651,13 @@ const App: React.FC = () => {
                                     ? selectedGazetteerFeature.properties.lon_east_0_360.toFixed(4) + '°'
                                     : selectedGazetteerFeature.properties.lon_westneg_180 
                                     ? selectedGazetteerFeature.properties.lon_westneg_180.toFixed(4) + '°'
-                                    : 'N/A'
+                                    : 'Data not available'
                                   }
                                 </span>
                               </div>
                               {selectedGazetteerFeature.properties.feature_type && (
                                 <div className="data-item">
-                                  <span className="data-label">Type:</span>
+                                  <span className="data-label">Gazetteer Type:</span>
                                   <span className="data-value">{selectedGazetteerFeature.properties.feature_type}</span>
                                 </div>
                               )}
@@ -633,7 +773,7 @@ const App: React.FC = () => {
                     {apolloMissions.map(mission => (
                       <div key={mission.name} className="apollo-mission-group">
                         <div className="apollo-mission-header">{mission.name}</div>
-                        {mission.features.slice(0, 3).map(feature => {
+                        {mission.features.slice(0, 3).map((feature: any) => {
                           const gazetteerFeature = gazetteerData.find(
                             f => f.properties.name === feature.name
                           );
@@ -661,6 +801,7 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {/* Moon Tour Page */}
       {currentPage === 'moon-tour' && (
         <div className="moon-tour-page">
           <div className="moon-tour-content">
@@ -674,7 +815,10 @@ const App: React.FC = () => {
                   selectedFeature={selectedFeature}
                   onNavigateToMoonData={() => setCurrentPage('moon-data')}
                   onNavigateToMain={() => setCurrentPage('main')}
+                  onNavigateToApolloSites={navigateToApolloSites}
                   onNavigateToMoonTour={() => setCurrentPage('moon-tour-map')}
+                  featuresToShow={featuresToShow}
+                  selectedTour={selectedTour}
                 />
               </div>
 
@@ -858,7 +1002,10 @@ const App: React.FC = () => {
                   selectedFeature={selectedFeature}
                   onNavigateToMoonData={() => setCurrentPage('moon-data')}
                   onNavigateToMain={() => setCurrentPage('main')}
+                  onNavigateToApolloSites={navigateToApolloSites}
                   onNavigateToMoonTour={() => setCurrentPage('moon-tour-map')}
+                  featuresToShow={featuresToShow}
+                  selectedTour={selectedTour}
                 />
               </div>
             </div>
@@ -872,7 +1019,7 @@ const App: React.FC = () => {
                   <button
                     className="tour-start-button"
                     onClick={() => {
-                      // Iniciar o tour autom\u00e1tico
+                      // Iniciar o tour automático
                       if ((window as any).startTour) {
                         (window as any).startTour();
                       }
@@ -975,7 +1122,8 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Main Content - Only show on main page */}
+      {currentPage === 'main' && (
       <div className="main-content">
         {/* Solar 3D Panel - Only show on main page */}
         {currentPage === 'main' && (
@@ -1038,6 +1186,7 @@ const App: React.FC = () => {
           />
         </main>
       </div>
+      )}
 
       {/* Help Modal */}
       {showHelp && (

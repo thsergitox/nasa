@@ -10,7 +10,11 @@ import {
   getPolygonPath,
   type ApolloTour
 } from '../services/gazetteer.service';
-import { type TourStep } from '../services/apollo-tour.service';
+import { 
+  type TourStep, 
+  generateTourSequence, 
+  getMissionDetails 
+} from '../services/apollo-tour.service';
 
 // Interface para características geológicas
 interface GeologicalFeature {
@@ -26,8 +30,9 @@ interface GeologicalFeature {
 interface MapViewerProps {
   currentBody: CelestialBody;
   is3DMode: boolean;
-  currentPage: 'main' | 'feature-detail' | 'moon-data' | 'apollo-sites' | 'moon-tour';
+  currentPage: 'main' | 'feature-detail' | 'moon-data' | 'apollo-sites' | 'moon-tour' | 'moon-tour-map';
   selectedFeature: GeologicalFeature | null;
+  selectedGazetteerFeature?: GazetteerFeature | null;
   onNavigateToMoonData: () => void;
   onNavigateToMain: () => void;
   onNavigateToApolloSites: () => void;
@@ -38,6 +43,7 @@ interface MapViewerProps {
   currentStepIndex?: number;
   isPlaying?: boolean;
   onTourStepComplete?: () => void;
+  onFeatureSelect?: (feature: GazetteerFeature | null) => void;
 }
 
 const MapViewer: React.FC<MapViewerProps> = ({ 
@@ -45,17 +51,29 @@ const MapViewer: React.FC<MapViewerProps> = ({
   is3DMode, 
   currentPage, 
   selectedFeature, 
+  selectedGazetteerFeature: externalSelectedGazetteerFeature,
   onNavigateToMoonData,
   onNavigateToApolloSites,
   onNavigateToMoonTour,
   selectedTour,
   featuresToShow,
-
+  onFeatureSelect
 }) => {
   const viewerRef = useRef<Cesium.Viewer | null>(null);
   const [provider, setProvider] = useState(() => getProviderForBody(currentBody));
   const [gazetteerData, setGazetteerData] = useState<GazetteerFeature[]>([]);
-  const [selectedGazetteerFeature, setSelectedGazetteerFeature] = useState<GazetteerFeature | null>(null);
+  const [internalSelectedGazetteerFeature, setInternalSelectedGazetteerFeature] = useState<GazetteerFeature | null>(null);
+  
+  // Usar o estado externo se disponível, senão usar o interno
+  const selectedGazetteerFeature = externalSelectedGazetteerFeature !== undefined ? externalSelectedGazetteerFeature : internalSelectedGazetteerFeature;
+  
+  const setSelectedGazetteerFeature = (feature: GazetteerFeature | null) => {
+    if (onFeatureSelect) {
+      onFeatureSelect(feature);
+    } else {
+      setInternalSelectedGazetteerFeature(feature);
+    }
+  };
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<GazetteerFeature[]>([]);
   const [showSearch, setShowSearch] = useState(false);
@@ -68,6 +86,157 @@ const MapViewer: React.FC<MapViewerProps> = ({
   const [polygonDataSources, setPolygonDataSources] = useState<Map<string, Cesium.GeoJsonDataSource>>(new Map());
   const [tourDataSource, setTourDataSource] = useState<Cesium.GeoJsonDataSource | null>(null);
   const [polygonLabels, setPolygonLabels] = useState<Map<string, Cesium.Entity>>(new Map());
+
+  // Estados para o tour Apollo
+  const [tourSequence, setTourSequence] = useState<TourStep[]>([]);
+  const [currentTourStep, setCurrentTourStep] = useState<number>(0);
+  const [isTourPlaying, setIsTourPlaying] = useState<boolean>(false);
+  const [tourTimeout, setTourTimeout] = useState<number | null>(null);
+  const [currentTourInfo, setCurrentTourInfo] = useState<{
+    title: string;
+    description: string;
+    mission: string;
+    step: 'reference' | 'landing';
+    missionDetails?: any;
+  } | null>(null);
+  const [showTourCompletedNotification, setShowTourCompletedNotification] = useState<boolean>(false);
+
+  // Função para voar para uma coordenada específica
+  const flyToCoordinates = (lat: number, lon: number, height: number = 500000) => {
+    console.log(`Flying to coordinates: lat=${lat}, lon=${lon}, height=${height}`);
+    
+    if (!viewerRef.current) {
+      console.log('Viewer not ready yet');
+      return;
+    }
+
+    const viewer = viewerRef.current;
+    console.log('Flying to destination...');
+    
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, height),
+      duration: 2.0,
+      orientation: {
+        heading: 0,
+        pitch: Cesium.Math.toRadians(-90),
+        roll: 0
+      }
+    });
+    
+    console.log('FlyTo command sent');
+  };
+
+  // Função para iniciar o tour
+  const startTour = () => {
+    console.log('Starting Apollo tour...');
+    const sequence = generateTourSequence();
+    console.log('Tour sequence received:', sequence.length, 'steps');
+    
+    setTourSequence(sequence);
+    setCurrentTourStep(0);
+    setIsTourPlaying(true);
+    setCurrentTourInfo(null);
+    
+    // Limpar timeout anterior se existir
+    if (tourTimeout) {
+      clearTimeout(tourTimeout);
+    }
+    
+    // Iniciar primeiro passo
+    playNextTourStep(sequence, 0);
+  };
+
+  // Função para pausar o tour
+  const pauseTour = () => {
+    setIsTourPlaying(false);
+    if (tourTimeout) {
+      clearTimeout(tourTimeout);
+      setTourTimeout(null);
+    }
+  };
+
+  // Função para continuar o tour
+  const resumeTour = () => {
+    if (tourSequence.length > 0) {
+      setIsTourPlaying(true);
+      playNextTourStep(tourSequence, currentTourStep);
+    }
+  };
+
+  // Função para ir para o próximo passo do tour
+  const playNextTourStep = (sequence: TourStep[], stepIndex: number) => {
+    console.log(`Playing tour step ${stepIndex + 1}/${sequence.length}`);
+    
+    if (stepIndex >= sequence.length) {
+      // Tour terminou
+      console.log('Tour completed!');
+      setIsTourPlaying(false);
+      setCurrentTourInfo(null);
+      setShowTourCompletedNotification(true);
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => {
+        setShowTourCompletedNotification(false);
+      }, 5000);
+      return;
+    }
+
+    const step = sequence[stepIndex];
+    console.log(`Step ${stepIndex + 1}: ${step.title} (${step.step})`);
+    console.log(`Coordinates: lat=${step.coordinates.lat}, lon=${step.coordinates.lon}`);
+    
+    setCurrentTourStep(stepIndex);
+    
+    // Voar para as coordenadas
+    flyToCoordinates(step.coordinates.lat, step.coordinates.lon);
+    
+    // Atualizar informações do tour
+    const missionDetails = getMissionDetails(step.mission.mission);
+    console.log('Mission details for', step.mission.mission, ':', missionDetails ? 'Found' : 'Not found');
+    
+    setCurrentTourInfo({
+      title: step.title,
+      description: step.description,
+      mission: step.mission.mission,
+      step: step.step,
+      missionDetails: missionDetails
+    });
+
+    // Agendar próximo passo
+    const timeout = setTimeout(() => {
+      playNextTourStep(sequence, stepIndex + 1);
+    }, step.duration * 1000);
+    
+    setTourTimeout(timeout);
+  };
+
+  // Função para pular para o próximo passo
+  const nextTourStep = () => {
+    if (tourTimeout) {
+      clearTimeout(tourTimeout);
+    }
+    if (tourSequence.length > 0 && currentTourStep < tourSequence.length - 1) {
+      playNextTourStep(tourSequence, currentTourStep + 1);
+    }
+  };
+
+  // Função para voltar ao passo anterior
+  const previousTourStep = () => {
+    if (tourTimeout) {
+      clearTimeout(tourTimeout);
+    }
+    if (tourSequence.length > 0 && currentTourStep > 0) {
+      playNextTourStep(tourSequence, currentTourStep - 1);
+    }
+  };
+
+  // Limpar timeout quando o componente for desmontado
+  useEffect(() => {
+    return () => {
+      if (tourTimeout) {
+        clearTimeout(tourTimeout);
+      }
+    };
+  }, [tourTimeout]);
 
 
   // Cargar polígonos de features seleccionadas
@@ -130,7 +299,8 @@ const MapViewer: React.FC<MapViewerProps> = ({
                 const polygon = entities[0];
                 if (polygon.polygon) {
                   // Calcular el centro del polígono
-                  const positions = polygon.polygon.hierarchy.getValue().positions;
+                  const positions = polygon.polygon.hierarchy?.getValue().positions;
+                  if (!positions) return;
                   const center = Cesium.BoundingSphere.fromPoints(positions).center;
                   const cartographic = Cesium.Cartographic.fromCartesian(center);
                   
@@ -714,9 +884,14 @@ const MapViewer: React.FC<MapViewerProps> = ({
       handleFeatureClick(feature);
     };
     
-    // Expor a função globalmente para uso externo
+    // Expor as funções globalmente para uso externo
     (window as any).flyToFeature = handleExternalFeatureSelect;
-  }, []);
+    (window as any).startTour = startTour;
+    (window as any).pauseTour = pauseTour;
+    (window as any).resumeTour = resumeTour;
+    (window as any).nextTourStep = nextTourStep;
+    (window as any).previousTourStep = previousTourStep;
+  }, [tourSequence, currentTourStep, tourTimeout]);
 
   const selectedPosition = selectedGazetteerFeature ? getFeaturePosition(selectedGazetteerFeature) : null;
   const hoveredPosition = hoveredFeature ? getFeaturePosition(hoveredFeature) : null;
@@ -834,36 +1009,15 @@ const MapViewer: React.FC<MapViewerProps> = ({
           </div>
         </div>
         <div className="menu-items">
+          {/* Home button hidden as requested */}
           <button 
             className="menu-item"
             onClick={() => {
-              // Voltar para vista global da Lua
-              if (viewerRef.current) {
-                viewerRef.current.camera.flyTo({
-                  destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000),
-                  duration: 2.0,
-                  orientation: {
-                    heading: 0,
-                    pitch: Cesium.Math.toRadians(-90),
-                    roll: 0
-                  }
-                });
+              // Navegar para a página Moon Tour Map
+              if (onNavigateToMoonTour) {
+                onNavigateToMoonTour();
               }
             }}
-          >
-            <div className="menu-item-icon">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-              </svg>
-                </div>
-            <div className="menu-item-content">
-            <span className="menu-text">Home</span>
-              <span className="menu-description">Global view</span>
-            </div>
-          </button>
-          <button 
-            className="menu-item"
-            onClick={onNavigateToApolloSites}
           >
             <div className="menu-item-icon">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -1042,6 +1196,111 @@ const MapViewer: React.FC<MapViewerProps> = ({
       )}
 
 
+      {/* Tour Information Panel - Only show during tour */}
+      {currentTourInfo && currentPage === 'moon-tour-map' && (
+        <div className="tour-info-panel">
+          <div className="tour-info-header">
+            <div className="tour-info-title">
+              <span className="tour-info-icon">
+                {currentTourInfo.step === 'reference' ? '📍' : '🚀'}
+              </span>
+              <span className="tour-info-name">{currentTourInfo.title}</span>
+            </div>
+            <div className="tour-info-mission">{currentTourInfo.mission}</div>
+          </div>
+          
+          <div className="tour-info-content">
+            <div className="tour-info-description">
+              <p>{currentTourInfo.description}</p>
+            </div>
+            
+            {/* Mostrar detalhes da missão apenas no passo de pouso */}
+            {currentTourInfo.step === 'landing' && currentTourInfo.missionDetails && (
+              <div className="tour-mission-details">
+                <div className="mission-detail-item">
+                  <span className="detail-label">Astronauts:</span>
+                  <span className="detail-value">{currentTourInfo.missionDetails.astronauts}</span>
+                </div>
+                <div className="mission-detail-item">
+                  <span className="detail-label">Landing Date:</span>
+                  <span className="detail-value">{currentTourInfo.missionDetails.landing_date}</span>
+                </div>
+                <div className="mission-detail-item">
+                  <span className="detail-label">Time on Moon:</span>
+                  <span className="detail-value">{currentTourInfo.missionDetails.duration_on_moon}</span>
+                </div>
+                <div className="mission-detail-item">
+                  <span className="detail-label">Samples:</span>
+                  <span className="detail-value">{currentTourInfo.missionDetails.samples_collected}</span>
+                </div>
+                
+                {/* Informações históricas adicionais */}
+                <div className="mission-historical-info">
+                  <h5>Historical Significance</h5>
+                  <p>{currentTourInfo.missionDetails.historical_significance}</p>
+                </div>
+                
+                <div className="mission-scientific-info">
+                  <h5>Scientific Value</h5>
+                  <p>{currentTourInfo.missionDetails.scientific_value}</p>
+                </div>
+              </div>
+            )}
+            
+            <div className="tour-info-progress">
+              <div className="tour-progress-bar">
+                <div 
+                  className="tour-progress-fill"
+                  style={{ width: `${((currentTourStep + 1) / tourSequence.length) * 100}%` }}
+                ></div>
+              </div>
+              <div className="tour-progress-text">
+                Step {currentTourStep + 1} of {tourSequence.length}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tour Controls - Only show during tour */}
+      {isTourPlaying && currentPage === 'moon-tour-map' && (
+        <div className="tour-controls-panel">
+          <div className="tour-controls-buttons">
+            <button
+              className="tour-control-btn"
+              onClick={previousTourStep}
+              disabled={currentTourStep === 0}
+              title="Previous Step"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+              </svg>
+            </button>
+            
+            <button
+              className="tour-control-btn"
+              onClick={pauseTour}
+              title="Pause Tour"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            </button>
+            
+            <button
+              className="tour-control-btn"
+              onClick={nextTourStep}
+              disabled={currentTourStep >= tourSequence.length - 1}
+              title="Next Step"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mini-map de localização - só aparece com zoom alto */}
       {currentPage === 'main' && cameraHeight > 0 && cameraHeight < 10000000 && (
         <div className="mini-map">
@@ -1142,6 +1401,31 @@ const MapViewer: React.FC<MapViewerProps> = ({
         })()}
         </Viewer>
       </div>
+
+      {/* Tour Completed Notification */}
+      {showTourCompletedNotification && (
+        <div className="tour-completed-notification">
+          <div className="notification-content">
+            <div className="notification-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            <div className="notification-text">
+              <h3>Tour Concluído!</h3>
+              <p>Você completou o tour das missões Apollo na Lua.</p>
+            </div>
+            <button 
+              className="notification-close"
+              onClick={() => setShowTourCompletedNotification(false)}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
